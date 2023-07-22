@@ -1,6 +1,6 @@
 from enum import Enum
 
-import cv2
+#import cv2
 
 from flask import Flask, request, send_file
 
