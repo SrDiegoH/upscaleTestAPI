@@ -6,7 +6,7 @@ from flask import Flask, request, send_file
 
 app = Flask(__name__)
 
-
+'''
 class BlurType:
     def blur(self, blut_type, image, intensity):
         return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
@@ -54,7 +54,7 @@ def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0
     blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
     return blurred_image
-
+'''
 
 @app.route('/')
 def root():
