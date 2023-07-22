@@ -1,7 +1,7 @@
-#from enum import Enum
+from enum import Enum
 
-#import cv2
-from .interpolation_upscale import apply_upscale
+import cv2
+#from .interpolation_upscale import apply_upscale
 
 from flask import Flask, request, send_file
 
@@ -74,9 +74,10 @@ def upscale():
     blur_type = request.values.get('blur_type').encode("UTF-8")
 
     #if upscale_type in dir(InterpolationType):
-    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+    #upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
-    return send_file(upscaled_image)
+    #return send_file(upscaled_image)
+    return 'Upscale'
 
 if __name__ == '__main__':
     app.run()
