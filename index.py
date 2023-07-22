@@ -6,30 +6,6 @@ from flask import Flask, request, send_file
 
 app = Flask(__name__)
 
-@app.route('/')
-def root():
-    return 'Working'
-
-@app.route('/', methods=['POST'])
-def upscale():
-    image = request.files('image')
-
-    upscale_type = request.values.get('upscale_type').encode("UTF-8")
-    scale_factor = int(equest.values.get('scale_factor').encode("UTF-8"))
-
-    denoise_intensity = int(request.values.get('denoise_intensity').encode("UTF-8"))
-
-    blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
-    blur_type = request.values.get('blur_type').encode("UTF-8")
-
-    if upscale_type in dir(InterpolationType):
-        upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
-
-    return send_file(upscaled_image)
-
-if __name__ == '__main__':
-    app.run()
-
 
 class BlurType:
     def blur(self, blut_type, image, intensity):
@@ -78,3 +54,28 @@ def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0
     blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
     return blurred_image
+
+
+@app.route('/')
+def root():
+    return 'Working'
+
+@app.route('/', methods=['POST'])
+def upscale():
+    image = request.files('image')
+
+    upscale_type = request.values.get('upscale_type').encode("UTF-8")
+    scale_factor = int(request.values.get('scale_factor').encode("UTF-8"))
+
+    denoise_intensity = int(request.values.get('denoise_intensity').encode("UTF-8"))
+
+    blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
+    blur_type = request.values.get('blur_type').encode("UTF-8")
+
+    #if upscale_type in dir(InterpolationType):
+    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+
+    return send_file(upscaled_image)
+
+if __name__ == '__main__':
+    app.run()
