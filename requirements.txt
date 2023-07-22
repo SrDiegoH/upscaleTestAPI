@@ -1,2 +1,2 @@
 Flask==2.2.2
-opencv-contrib-python
+opencv-contrib-python-headless
