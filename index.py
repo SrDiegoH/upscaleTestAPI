@@ -2,6 +2,7 @@
 
 #import cv2
 from .interpolation_upscale import apply_upscale
+
 from flask import Flask, request, send_file
 
 app = Flask(__name__)
@@ -72,11 +73,10 @@ def upscale():
     blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
     blur_type = request.values.get('blur_type').encode("UTF-8")
 
-    ##if upscale_type in dir(InterpolationType):
+    #if upscale_type in dir(InterpolationType):
     upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
     return send_file(upscaled_image)
-    pass
 
 if __name__ == '__main__':
     app.run()
