@@ -1,6 +1,8 @@
-from flask import Flask, request, send_file
+from enum import Enum
 
-#from interpolation_upscale import apply_upscale, InterpolationType
+import cv2
+
+from flask import Flask, request, send_file
 
 app = Flask(__name__)
 
