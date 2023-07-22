@@ -41,7 +41,7 @@ class InterpolationType(Enum):
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
 
-def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type=SIMPLE_BLUR):
+def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
     (image_height, image_width) = image.shape[:2]
 
     new_width = int(image_width * scale_factor)
@@ -62,20 +62,21 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale():
-    image = request.files('image')
+    #image = request.files('image')
 
-    upscale_type = request.values.get('upscale_type').encode("UTF-8")
-    scale_factor = int(request.values.get('scale_factor').encode("UTF-8"))
+    #upscale_type = request.values.get('upscale_type').encode("UTF-8")
+    #scale_factor = int(request.values.get('scale_factor').encode("UTF-8"))
 
-    denoise_intensity = int(request.values.get('denoise_intensity').encode("UTF-8"))
+    #denoise_intensity = int(request.values.get('denoise_intensity').encode("UTF-8"))
 
-    blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
-    blur_type = request.values.get('blur_type').encode("UTF-8")
+    #blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
+    #blur_type = request.values.get('blur_type').encode("UTF-8")
 
-    #if upscale_type in dir(InterpolationType):
-    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+    ##if upscale_type in dir(InterpolationType):
+    #upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
-    return send_file(upscaled_image)
+    #return send_file(upscaled_image)
+    pass
 
 if __name__ == '__main__':
     app.run()
