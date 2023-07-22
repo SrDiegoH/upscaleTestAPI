@@ -1,6 +1,6 @@
 from flask import Flask, request, send_file
 
-from .interpolation_upscale import apply_upscale, InterpolationType
+from interpolation_upscale import apply_upscale, InterpolationType
 
 app = Flask(__name__)
 

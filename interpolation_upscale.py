@@ -2,8 +2,8 @@ from enum import Enum
 
 import cv2
 
-from .blur import apply_blur
-from .denoise import apply_denoise
+from blur import apply_blur
+from denoise import apply_denoise
 
 class InterpolationType(Enum):
     NEAREST_NEIGHBOR = cv2.INTER_NEAREST
