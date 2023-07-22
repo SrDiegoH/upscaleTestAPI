@@ -10,6 +10,7 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale():
+    '''
     image = request.files('image')
 
     upscale_type = request.values.get('upscale_type').encode("UTF-8")
@@ -24,6 +25,8 @@ def upscale():
         upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
     return send_file(upscaled_image)
+    '''
+    pass
 
 if __name__ == '__main__':
     app.run()
