@@ -75,11 +75,16 @@ def upscale():
     image_bytes = np.fromstring(image.read(), np.uint8)
 
     upscale_type = request.values.get('upscale_type')
-    scale_factor = int(request.values.get('scale_factor', default=4))
 
-    denoise_intensity = int(request.values.get('denoise_intensity', default=0))
+    raw_scale_factor = request.values.get('scale_factor')
+    scale_factor = int(raw_scale_factor.strip()) if raw_scale_factor else None
 
-    blur_intensity = int(request.values.get('blur_intensity', default=0))
+    raw_denoise_intensity = request.values.get('denoise_intensity')
+    denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else None
+
+    raw_blur_intensity = request.values.get('blur_intensity')
+    blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else None
+
     blur_type = request.values.get('blur_type')
 
     #if upscale_type in dir(InterpolationType):
