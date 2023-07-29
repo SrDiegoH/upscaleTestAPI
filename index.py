@@ -4,7 +4,8 @@ import numpy as np
 import cv2
 #from .interpolation_upscale import apply_upscale
 
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, Response
+
 
 app = Flask(__name__)
 
@@ -67,6 +68,10 @@ def root():
 def upscale():
     #return f'Request values: {request.values}, Request form: {request.form}, Request files: {request.files}'
     image = request.files.get('image')
+
+    if image is None:
+        return Response("Image Not Found", status=400)
+ 
     image_bytes = np.fromstring(image.read(), np.uint8)
 
     upscale_type = request.values.get('upscale_type')
