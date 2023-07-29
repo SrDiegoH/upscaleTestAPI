@@ -99,9 +99,8 @@ def upscale():
 
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
 
-    encoded_upscaled_image = 
-    upscaled_image_bytes = np.array(encoded_upscaled_image).tobytes()
-    return f'<img src="data:image/png;base64, ({type(encoded_upscaled_image)})">'
+    upscaled_image_bytes = np.array(upscaled_image).tobytes()
+    return f'<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">'
 
 
 if __name__ == '__main__':
