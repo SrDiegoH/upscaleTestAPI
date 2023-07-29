@@ -31,6 +31,7 @@ def apply_blur(blur_type, image, intensity):
 def apply_denoise(image, intensity, template_window=7, search_window=21):
     return cv2.fastNlMeansDenoisingColored(image, None, intensity, intensity, template_window, search_window)
 
+'''
 
 class InterpolationType(Enum):
     NEAREST_NEIGHBOR = cv2.INTER_NEAREST
@@ -48,14 +49,14 @@ def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0
     new_width = int(image_width * scale_factor)
     new_height = int(image_height * scale_factor)
 
-    new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
+    #new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
 
-    denoised_image = apply_denoise(new_image, denoise_intensity)
+    #denoised_image = apply_denoise(new_image, denoise_intensity)
 
-    blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
+    #blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
-    return blurred_image
-'''
+    #return blurred_image
+    return image
 
 @app.route('/')
 def root():
@@ -74,7 +75,7 @@ def upscale():
     blur_type = request.values.get('blur_type').encode("UTF-8")
 
     #if upscale_type in dir(InterpolationType):
-    #upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
     #return send_file(upscaled_image)
     return 'Upscale'
