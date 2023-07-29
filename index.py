@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 import numpy as np
@@ -96,8 +97,8 @@ def upscale():
         return Response("Upscale Type Not Found", status=400)
 
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return image
-    #return send_file(upscaled_image.tofile('upscaled_image'.), mimetype='image/png')
+    return f'Image: {image}, {dir(image)}, {datetime.now()}'
+    #return send_file(upscaled_image.tofile(f'upscaled_image_{datetime.now()}'), mimetype='image/png')
 
 
 if __name__ == '__main__':
