@@ -64,7 +64,7 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale():
-    return f'Request values: {request.values}, Request form: {request.form}, Request json: {request.json}'
+    return f'Request values: {request.values}, Request form: {request.form}'
     image = request.files('image')
 
     upscale_type = request.values.get('upscale_type', default='SIMPLE_BLUR').encode("UTF-8")
