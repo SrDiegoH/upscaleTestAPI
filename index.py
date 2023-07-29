@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 from enum import Enum
 
@@ -69,7 +70,6 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale():
-    #return f''
     image = request.files.get('image')
 
     if image is None:
@@ -104,7 +104,7 @@ def upscale():
 
     encoded_upscaled_image = cv2.imencode('.png', upscaled_image)[1]
     upscaled_image_bytes = np.array(encoded_upscaled_image).tobytes()
-    return f'<img src="data:image/png;base64, ({upscaled_image_bytes})">'
+    return f'<img src="data:image/png;base64, ({base64.b64encode(upscaled_image_bytes)})">'
 
 
 
