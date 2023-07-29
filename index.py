@@ -7,7 +7,7 @@ import cv2
 from flask import Flask, render_template, request, Response
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='template')
 
 class BlurType:
     def blur(self, blut_type, image, intensity):
