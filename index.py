@@ -29,11 +29,11 @@ class BlurType:
 def apply_blur(blur_type, image, intensity):
     return BlurType().blur(blur_type, image, intensity)
 
+'''
 
 def apply_denoise(image, intensity, template_window=7, search_window=21):
     return cv2.fastNlMeansDenoisingColored(image, None, intensity, intensity, template_window, search_window)
 
-'''
 
 class InterpolationType(Enum):
     NEAREST_NEIGHBOR = cv2.INTER_NEAREST
@@ -55,12 +55,12 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor=4, denoise_inten
 
     new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
 
-    #denoised_image = apply_denoise(new_image, denoise_intensity)
+    denoised_image = apply_denoise(new_image, denoise_intensity)
 
     #blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
     #return blurred_image
-    return new_image
+    return denoised_image
 
 @app.route('/')
 def root():
@@ -68,7 +68,7 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale():
-    #return f'Request values: {request.values}, Request form: {request.form}, Request files: {request.files}'
+    #return f''
     image = request.files.get('image')
 
     if image is None:
@@ -95,9 +95,10 @@ def upscale():
     else:
         return Response("Upscale Type Not Found", status=400)
 
-
     #return send_file(upscaled_image)
-    return f'Upscale type: {upscale_type}, Scale factor: {scale_factor}, Denoise intensity: {denoise_intensity}, Blur intensity: {blur_intensity}, Blur type: {blur_type}, Image: {image}, Image Bytes: {image_bytes}, Upscaled Image: {upscaled_image}'
+    #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
+    return upscaled_image
+
 
 if __name__ == '__main__':
     app.run()
