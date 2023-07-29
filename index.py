@@ -96,10 +96,17 @@ def upscale():
     else:
         return Response("Upscale Type Not Found", status=400)
 
-    file_name = image.filename.replace(".", f'_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.', image.filename.rfind('.'))
-    cv2.imwrite(file_name, upscaled_image) #, cv2.cvtColor(upscaled_image, cv2.COLOR_RGB2BGR))
+    #file_name = image.filename.replace(".", f'_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.', image.filename.rfind('.'))
+    #cv2.imwrite(file_name, upscaled_image) #, cv2.cvtColor(upscaled_image, cv2.COLOR_RGB2BGR))
+    #return send_file(file_name, mimetype='image/png')
+
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return send_file(file_name, mimetype='image/png')
+
+    encoded_upscaled_image = cv2.imencode('.png', upscaled_image)[1]
+    upscaled_image_bytes = np.array(encoded_upscaled_image).tobytes()
+    return upscaled_image_bytes
+
+
 
 
 if __name__ == '__main__':
