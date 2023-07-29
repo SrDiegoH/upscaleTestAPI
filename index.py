@@ -45,7 +45,9 @@ class InterpolationType(Enum):
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
 
-def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+def apply_upscale(interpolation_type, image_bytes, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+    image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+
     (image_height, image_width) = image.shape[:2]
 
     new_width = int(image_width * scale_factor)
@@ -72,7 +74,7 @@ def upscale():
     if image is None:
         return Response("Image Not Found", status=400)
  
-    image_bytes = np.fromstring(image.read(), np.uint8)
+    image_bytes = np.fromfile(image, np.uint8)
 
     upscale_type = request.values.get('upscale_type')
 
