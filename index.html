@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <tite>Upscale Experiment</title>
+    </head>
+    <body>
+        <form method="POST" action="/" enctype="multipart/form-data">
+            <label for="image">Imagem: </label>
+            <input name="image" type="file" accept="image/png,image/jpeg"/>
+            </br>
+            <label for="upscale_type">Tipo de aumento: </label>
+            <select name="upscale_type">
+                <option value="NEAREST_NEIGHBOR">Vizinho mais próximo</option>
+                <option value="NEAREST_NEIGHBOR_EXACT">Vizinho mais próximo - Exato</option>
+                <option value="BILINEAR">Bilinear</option>
+                <option value="BILINEAR_EXACT">Bilinear - Exato</option>
+                <option value="BICUBIC">Bicúbico</option>
+                <option value="AREA">Area</option>
+                <option value="LANCZOS4">Lanczos4</option>
+                <option value="BITS2">Bits2</option>
+                <option value="EDSR">SR - EDSR</option>
+                <option value="ESPCN">SR - ESPCN</option>
+                <option value="FSRCNN">SR - FSR CNN</option>
+                <option value="FSRCNN_SMALL">SR - FSR CNN Small</option>
+                <option value="LAPSRN">SR - LAPSRN</option>
+                <option value="REAL_ESRGAN_PLUS">SR - REAL ESRGAN Plus</option>
+                <option value="REAL_ESRGAN_PLUS_ANIME_6B">SR - REAL ESRGAN Plus Anime</option>
+                <option value="REAL_ESRGAN_NET">SR - REAL ESRGAN NET</option>
+                <option value="REAL_ESR_ANIME_VIDEO">SR - REAL ESR Anime Video</option>
+                <option value="REAL_ESR_ANIME_VIDEO_V3">SR - REAL ESR Anime Video versão 3</option>
+                <option value="REAL_ESR_GENERAL">SR - REAL ESR Geral</option>
+                <option value="REAL_ESR_GENERAL_WDN">SR - REAL ESR Geral WDN</option>
+            </select>
+            </br>
+            <label for="scale_factor">Fator de crescimento: </label>            
+            <select name="scale_factor">
+                <option value="2">2 vezes a imagem original</option>
+                <option value="4">4 vezes a imagem original</option>
+                <option value="8">8 vezes a imagem original</option>
+            </select>
+            </br>
+            <label for="denoise_intensity">Intensidade do removedor do ruido: </label>
+            <input name="denoise_intensity" type="number"/>
+            </br>
+            <label for="blur_intensity">Intensidade do borrão: </label>
+            <input name="blur_intensity" type="number"/>
+            </br>
+            <label for="blur_type">Tipo de borrão: </label>
+            <select name="blur_type">
+                <option value="SIMPLE_BLUR">Borrão Normal</option>
+                <option value="MEDIAN_BLUR">Borrão Mediano</option>
+                <option value="GAUSSIAN_BLUR">Borrão Gausiano (distribuição normal)</option>
+                <option value="BILATERAL_FILTER">Filtro bilateral</option>
+            </select>
+            </br>
+            <p><input type="submit" value="Processar Imagem"></p>
+        </form>
+    </body>
+</html>

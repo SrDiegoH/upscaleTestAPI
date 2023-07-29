@@ -1,12 +1,10 @@
 import base64
-from datetime import datetime
 from enum import Enum
 
 import numpy as np
 import cv2
-#from .interpolation_upscale import apply_upscale
 
-from flask import Flask, request, send_file, Response
+from flask import Flask, render_template, request, Response
 
 
 app = Flask(__name__)
@@ -28,7 +26,8 @@ class BlurType:
         return cv2.bilateralFilter(image, intensity, 100, 100)
 
 def apply_blur(blur_type, image, intensity):
-    return BlurType().blur(blur_type, image, intensity)
+    odd_intensity = intensity if intensity % 2 == 1 else intensity + 1
+    return BlurType().blur(blur_type, image, odd_intensity)
 
 
 def apply_denoise(image, intensity, template_window=7, search_window=21):
@@ -63,7 +62,7 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor=4, denoise_inten
 
 @app.route('/')
 def root():
-    return 'Working'
+    return render_template('index.html')
 
 @app.route('/', methods=['POST'])
 def upscale():
@@ -86,22 +85,14 @@ def upscale():
     blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else None
 
     raw_blur_type = request.values.get('blur_type')
-    blur_type = raw_blur_type.strip() #if raw_blur_type and raw_blur_type.strip() in dir(InterpolationType) else None
+    blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
 
     if upscale_type in dir(InterpolationType):
         upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
+        upscaled_image_bytes = np.array(upscaled_image).tobytes()
+        return f'<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">'
     else:
         return Response("Upscale Type Not Found", status=400)
-
-    #file_name = image.filename.replace(".", f'_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.', image.filename.rfind('.'))
-    #cv2.imwrite(file_name, upscaled_image) #, cv2.cvtColor(upscaled_image, cv2.COLOR_RGB2BGR))
-    #return send_file(file_name, mimetype='image/png')
-
-    #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-
-    upscaled_image_bytes = np.array(upscaled_image).tobytes()
-    return f'<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">'
-
 
 if __name__ == '__main__':
     app.run()

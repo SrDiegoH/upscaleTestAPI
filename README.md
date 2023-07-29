@@ -1,6 +1,8 @@
 # upscaleTestAPI
 Test different Upscale and Super Resolution projects
 
+Resources used in this repo can be found in [upscaleTestResources](https://github.com/SrDiegoH/upscaleTestResources)
+
 Projects used in this repo:
 - EDSR: https://github.com/Saafke/EDSR_Tensorflow
 - ESPCN: https://github.com/fannymonori/TF-ESPCN
