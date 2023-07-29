@@ -97,9 +97,8 @@ def upscale():
         return Response("Upscale Type Not Found", status=400)
 
     file_name = image.filename.replace(".", f'_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.', image.filename.rfind('.'))
-    teste = cv2.imwrite(file_name, upscaled_image)
+    cv2.imwrite(file_name, upscaled_image) #, cv2.cvtColor(upscaled_image, cv2.COLOR_RGB2BGR))
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return f'{teste}'
     return send_file(file_name, mimetype='image/png')
 
 
