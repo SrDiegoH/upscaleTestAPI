@@ -49,14 +49,14 @@ def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0
     new_width = int(image_width * scale_factor)
     new_height = int(image_height * scale_factor)
 
-    #new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
+    new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
 
     #denoised_image = apply_denoise(new_image, denoise_intensity)
 
     #blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
     #return blurred_image
-    return image
+    return new_image
 
 @app.route('/')
 def root():
