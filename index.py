@@ -66,19 +66,19 @@ def root():
 def upscale():
     image = request.files('image')
 
-    upscale_type = request.values.get('upscale_type').encode("UTF-8")
-    scale_factor = int(request.values.get('scale_factor').encode("UTF-8"))
+    upscale_type = request.values.get('upscale_type', default='SIMPLE_BLUR').encode("UTF-8")
+    scale_factor = int(request.values.get('scale_factor', default=4).encode("UTF-8"))
 
-    denoise_intensity = int(request.values.get('denoise_intensity').encode("UTF-8"))
+    denoise_intensity = int(request.values.get('denoise_intensity', default=0).encode("UTF-8"))
 
-    blur_intensity = int(request.values.get('blur_intensity').encode("UTF-8"))
-    blur_type = request.values.get('blur_type').encode("UTF-8")
+    blur_intensity = int(request.values.get('blur_intensity', default=0).encode("UTF-8"))
+    blur_type = request.values.get('blur_type', default=0).encode("UTF-8")
 
     #if upscale_type in dir(InterpolationType):
     upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
     #return send_file(upscaled_image)
-    return 'Upscale'
+    return f'Upscale type: {upscale_type}, Scale factor: {scale_factor}, Denoise intensity: {denoise_intensity}, Blur intensity: {blur_intensity}, Blur type: {blur_type}'
 
 if __name__ == '__main__':
     app.run()
