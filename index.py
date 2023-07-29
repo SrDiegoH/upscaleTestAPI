@@ -11,7 +11,6 @@ from flask import Flask, request, send_file, Response
 
 app = Flask(__name__)
 
-'''
 class BlurType:
     def blur(self, blut_type, image, intensity):
         return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
@@ -31,7 +30,6 @@ class BlurType:
 def apply_blur(blur_type, image, intensity):
     return BlurType().blur(blur_type, image, intensity)
 
-'''
 
 def apply_denoise(image, intensity, template_window=7, search_window=21):
     return cv2.fastNlMeansDenoisingColored(image, None, intensity, intensity, template_window, search_window)
@@ -59,10 +57,9 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor=4, denoise_inten
 
     denoised_image = apply_denoise(new_image, denoise_intensity)
 
-    #blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
+    blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
-    #return blurred_image
-    return denoised_image
+    return cv2.imencode('.png', blurred_image)[1]
 
 @app.route('/')
 def root():
@@ -102,7 +99,7 @@ def upscale():
 
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
 
-    encoded_upscaled_image = cv2.imencode('.png', upscaled_image)[1]
+    encoded_upscaled_image = 
     upscaled_image_bytes = np.array(encoded_upscaled_image).tobytes()
     return f'<img src="data:image/png;base64, ({type(encoded_upscaled_image)})">'
 
