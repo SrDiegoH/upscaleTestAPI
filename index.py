@@ -94,7 +94,7 @@ def upscale():
     if upscale_type in dir(InterpolationType):
         upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
-        return render_template('index.html', image='<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">')
+        return render_template('index.html', image=f'<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">')
     else:
         return Response("Upscale Type Not Found", status=400)
 
