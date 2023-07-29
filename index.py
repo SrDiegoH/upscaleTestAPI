@@ -96,10 +96,10 @@ def upscale():
     else:
         return Response("Upscale Type Not Found", status=400)
 
-    file_name = f'{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}{image.filename}'
+    file_name = image.filename.replace(".", f'_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.', image.filename.rfind('.'))
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return f'Image: {image}, {dir(image)}, {image.filename}, {datetime.now()}, {datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}, {image.filename}{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
-    #return send_file(upscaled_image.tofile(f'upscaled_image_{datetime.now()}'), mimetype='image/png')
+    return f'Image: {image}, {dir(image)}, {image.filename}, {datetime.now()}, {datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}, {file_name}'
+    #return send_file(upscaled_image.tofile(file_name), mimetype='image/png')
 
 
 if __name__ == '__main__':
