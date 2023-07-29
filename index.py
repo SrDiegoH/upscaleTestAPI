@@ -1,5 +1,6 @@
 from enum import Enum
 
+import numpy as np
 import cv2
 #from .interpolation_upscale import apply_upscale
 
@@ -66,6 +67,7 @@ def root():
 def upscale():
     #return f'Request values: {request.values}, Request form: {request.form}, Request files: {request.files}'
     image = request.files.get('image')
+    image_bytes = np.fromstring(image.read(), np.uint8)
 
     upscale_type = request.values.get('upscale_type')
     scale_factor = int(request.values.get('scale_factor', default=4))
@@ -76,7 +78,7 @@ def upscale():
     blur_type = request.values.get('blur_type')
 
     #if upscale_type in dir(InterpolationType):
-    #upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
     #return send_file(upscaled_image)
     return f'Upscale type: {upscale_type}, Scale factor: {scale_factor}, Denoise intensity: {denoise_intensity}, Blur intensity: {blur_intensity}, Blur type: {blur_type}, Image: {image}'
