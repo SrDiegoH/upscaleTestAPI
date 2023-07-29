@@ -44,7 +44,7 @@ class InterpolationType(Enum):
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
 
-def apply_upscale(interpolation_type, image_bytes, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
     image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
     (image_height, image_width) = image.shape[:2]
@@ -68,15 +68,17 @@ def root():
 def upscale():
     image = request.files.get('image')
 
-    if image is None:
+    if not image:
         return Response("Image Not Found", status=400)
  
     image_bytes = np.fromfile(image, np.uint8)
 
-    upscale_type = request.values.get('upscale_type')
-
     raw_scale_factor = request.values.get('scale_factor')
-    scale_factor = int(raw_scale_factor.strip()) if raw_scale_factor else None
+
+    if not raw_scale_factor:
+        return Response("Image Not Found", status=400)
+
+    scale_factor = int(raw_scale_factor.strip())
 
     raw_denoise_intensity = request.values.get('denoise_intensity')
     denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else None
@@ -86,6 +88,8 @@ def upscale():
 
     raw_blur_type = request.values.get('blur_type')
     blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
+
+    upscale_type = request.values.get('upscale_type')
 
     if upscale_type in dir(InterpolationType):
         upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)

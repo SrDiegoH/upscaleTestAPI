@@ -1,16 +1,17 @@
 <!doctype html>
 <html>
     <head>
-        <tite>Upscale Experiment</title>
+        <title>Upscale Experiment</title>
     </head>
     <body>
         <form method="POST" action="/" enctype="multipart/form-data">
             <label for="image">Imagem: </label>
-            <input name="image" type="file" accept="image/png,image/jpeg"/>
+            <input name="image" type="file" accept="image/png,image/jpeg" required/>
+            </br>
             </br>
             <label for="upscale_type">Tipo de aumento: </label>
-            <select name="upscale_type">
-                <option value="NEAREST_NEIGHBOR">Vizinho mais próximo</option>
+            <select name="upscale_type" required>
+                <option value="NEAREST_NEIGHBOR" selected>Vizinho mais próximo</option>
                 <option value="NEAREST_NEIGHBOR_EXACT">Vizinho mais próximo - Exato</option>
                 <option value="BILINEAR">Bilinear</option>
                 <option value="BILINEAR_EXACT">Bilinear - Exato</option>
@@ -32,21 +33,24 @@
                 <option value="REAL_ESR_GENERAL_WDN">SR - REAL ESR Geral WDN</option>
             </select>
             </br>
+            </br>
             <label for="scale_factor">Fator de crescimento: </label>            
             <select name="scale_factor">
+                <option value="" disabled selected>Selecione</option>
                 <option value="2">2 vezes a imagem original</option>
                 <option value="4">4 vezes a imagem original</option>
                 <option value="8">8 vezes a imagem original</option>
             </select>
             </br>
             <label for="denoise_intensity">Intensidade do removedor do ruido: </label>
-            <input name="denoise_intensity" type="number"/>
+            <input name="denoise_intensity" type="number" value="0"/>
             </br>
             <label for="blur_intensity">Intensidade do borrão: </label>
-            <input name="blur_intensity" type="number"/>
+            <input name="blur_intensity" type="number" value="0"/>
             </br>
             <label for="blur_type">Tipo de borrão: </label>
             <select name="blur_type">
+                <option value="" disabled selected>Selecione</option>
                 <option value="SIMPLE_BLUR">Borrão Normal</option>
                 <option value="MEDIAN_BLUR">Borrão Mediano</option>
                 <option value="GAUSSIAN_BLUR">Borrão Gausiano (distribuição normal)</option>
