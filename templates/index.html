@@ -35,10 +35,9 @@
             </br>
             </br>
             <label for="scale_factor">Fator de crescimento: </label>            
-            <select name="scale_factor">
-                <option value="" disabled selected>Selecione</option>
+            <select name="scale_factor" required>
                 <option value="2">2 vezes a imagem original</option>
-                <option value="4">4 vezes a imagem original</option>
+                <option value="4" selected>4 vezes a imagem original</option>
                 <option value="8">8 vezes a imagem original</option>
             </select>
             </br>
@@ -59,6 +58,6 @@
             </br>
             <p><input type="submit" value="Processar Imagem"></p>
         </form>
-        {{ image }}
+        <img src="data:image/png;base64,{{ image }}">
     </body>
 </html>

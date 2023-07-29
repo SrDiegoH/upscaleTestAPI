@@ -69,14 +69,14 @@ def upscale():
     image = request.files.get('image')
 
     if not image:
-        return Response("Image Not Found", status=400)
+        return Response("Imagem não enviada", status=400)
  
     image_bytes = np.fromfile(image, np.uint8)
 
     raw_scale_factor = request.values.get('scale_factor')
 
     if not raw_scale_factor:
-        return Response("Image Not Found", status=400)
+        return Response("Fator de crescimento não enviado", status=400)
 
     scale_factor = int(raw_scale_factor.strip())
 
@@ -94,9 +94,10 @@ def upscale():
     if upscale_type in dir(InterpolationType):
         upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
-        return render_template('index.html', image=f'<img src="data:image/png;base64,{base64.b64encode(upscaled_image_bytes).decode("utf-8")}">')
-    else:
-        return Response("Upscale Type Not Found", status=400)
+        upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
+        return render_template('index.html', image=upscaled_image_base64)
+
+    return Response("Tipo de aumento não enviado", status=400)
 
 if __name__ == '__main__':
     app.run()
