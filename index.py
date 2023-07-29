@@ -97,7 +97,7 @@ def upscale():
         return Response("Upscale Type Not Found", status=400)
 
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return f'Image: {image}, {dir(image)}, {datetime.now()}'
+    return f'Image: {image}, {dir(image)}, {datetime.now()}, {datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
     #return send_file(upscaled_image.tofile(f'upscaled_image_{datetime.now()}'), mimetype='image/png')
 
 
