@@ -95,9 +95,9 @@ def upscale():
     else:
         return Response("Upscale Type Not Found", status=400)
 
-    #return send_file(upscaled_image)
     #return f'Request values: {request.values}\nRequest form: {request.form}\nRequest files: {request.files}\nUpscale type: {upscale_type}\nScale factor: {scale_factor}\nDenoise intensity: {denoise_intensity}\nBlur intensity: {blur_intensity}\nBlur type: {blur_type}\nImage: {image}\nImage Bytes: {image_bytes}\nUpscaled Image: {upscaled_image}'
-    return upscaled_image
+    return send_file(upscaled_image)
+    #return f'Upscaled Image: {upscaled_image}'
 
 
 if __name__ == '__main__':
