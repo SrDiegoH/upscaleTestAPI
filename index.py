@@ -1,12 +1,13 @@
 from enum import Enum
 
 import cv2
+#from .interpolation_upscale import apply_upscale
 
 from flask import Flask, request, send_file
 
 app = Flask(__name__)
 
-
+'''
 class BlurType:
     def blur(self, blut_type, image, intensity):
         return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
@@ -41,7 +42,7 @@ class InterpolationType(Enum):
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
 
-def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type=SIMPLE_BLUR):
+def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
     (image_height, image_width) = image.shape[:2]
 
     new_width = int(image_width * scale_factor)
@@ -54,7 +55,7 @@ def apply_upscale(interpolation_type, image, scale_factor=4, denoise_intensity=0
     blurred_image = apply_blur(blur_type, denoised_image, blur_intensity)
 
     return blurred_image
-
+'''
 
 @app.route('/')
 def root():
@@ -73,9 +74,10 @@ def upscale():
     blur_type = request.values.get('blur_type').encode("UTF-8")
 
     #if upscale_type in dir(InterpolationType):
-    upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
+    #upscaled_image = apply_upscale(upscale_type, image, scale_factor, denoise_intensity, blur_intensity, blur_type)
 
-    return send_file(upscaled_image)
+    #return send_file(upscaled_image)
+    return 'Upscale'
 
 if __name__ == '__main__':
     app.run()
