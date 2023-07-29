@@ -104,7 +104,7 @@ def upscale():
 
     encoded_upscaled_image = cv2.imencode('.png', upscaled_image)[1]
     upscaled_image_bytes = np.array(encoded_upscaled_image).tobytes()
-    return upscaled_image_bytes
+    return f'<img src="data:image/png;base64, ({upscaled_image_bytes})">'
 
 
 
