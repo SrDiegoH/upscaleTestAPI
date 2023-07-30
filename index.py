@@ -15,8 +15,11 @@ app = Flask(__name__)
 
 class BlurType:
     def blur(self, image, blut_type='SIMPLE_BLUR', intensity=0):
+        if intensity == 0:
+            return image
+
         is_odd = intensity % 2 == 1
-        intensity = intensity if is_odd or intensity == 0 else intensity + 1
+        intensity = intensity if is_odd else intensity + 1
 
         return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
 
@@ -27,7 +30,6 @@ class BlurType:
         return cv2.medianBlur(image, intensity)
 
     def _SIMPLE_BLUR(self, image, intensity):
-        print(intensity)
         return cv2.blur(image, (intensity, intensity))
 
     def _BILATERAL_FILTER(self, image, intensity):
