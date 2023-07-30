@@ -29,12 +29,13 @@ class BlurType:
     def _BILATERAL_FILTER(self, image, intensity):
         return cv2.bilateralFilter(image, intensity, 100, 100)
 
-def apply_blur(image, blur_type, intensity):
-    odd_intensity = intensity if intensity % 2 == 1 else intensity + 1
+def apply_blur(image, blur_type=0, intensity='SIMPLE_BLUR'):
+    is_intensity_odd = intensity % 2 == 1
+    odd_intensity = intensity if is_intensity_odd else intensity + 1
     return BlurType().blur(image, blur_type, odd_intensity)
 
 
-def apply_denoise(image, intensity, template_window=7, search_window=21):
+def apply_denoise(image, intensity=0, template_window=7, search_window=21):
     return cv2.fastNlMeansDenoisingColored(image, None, intensity, intensity, template_window, search_window)
 
 
@@ -48,7 +49,7 @@ class InterpolationType(Enum):
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
 
-def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+def apply_upscale(interpolation_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
     image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
     (image_height, image_width) = image.shape[:2]
@@ -70,7 +71,7 @@ def delete_file(file_path):
         os.remove(file_path)
 
 class SuperResolutionType:
-    def super_resolution(self, super_resolution_type, image, scale_factor=4, denoise_intensity=0):
+    def super_resolution(self, super_resolution_type, image, denoise_intensity, scale_factor=4):
         self.super_resolution_network = cv2.dnn_superres.DnnSuperResImpl_create()
         self.base_url = 'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models'
 
@@ -254,10 +255,10 @@ class SuperResolutionType:
         return np.ascontiguousarray(new_image, dtype=np.uint8)
     '''
 
-def apply_super_resolution(super_resolution_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur_intensity, blur_type, scale_factor):
     rgb_image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
 
-    upscaled_image = SuperResolutionType().super_resolution(super_resolution_type, rgb_image, scale_factor, denoise_intensity)
+    upscaled_image = SuperResolutionType().super_resolution(super_resolution_type, rgb_image, denoise_intensity, scale_factor)
 
     blurred_image = apply_blur(upscaled_image, blur_type, blur_intensity)
 
@@ -294,16 +295,15 @@ def upscale():
         return 'Tipo de aumento não enviado', 400
 
     if upscale_type in dir(InterpolationType):
-        upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
+        upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
     elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
-        upscaled_image = apply_super_resolution(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
+        upscaled_image = apply_super_resolution(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
     else:
         return 'Tipo de aumento não conhecido', 400
 
     upscaled_image_bytes = np.array(upscaled_image).tobytes()
     upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
     return upscaled_image_base64, 200
-
 
 @app.route('/')
 def root():
