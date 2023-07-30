@@ -313,7 +313,7 @@ def upscale():
         return upscaled_image_base64, 200
     except Exception as error:
             traceback.print_exc()
-            logger.exception("Exception Occured while code Execution: " + str(error))
+            #logger.exception("Exception Occured while code Execution: " + str(error))
             return repr(error), 500
 
 @app.route('/')
