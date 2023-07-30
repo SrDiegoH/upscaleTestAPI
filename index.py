@@ -3,6 +3,7 @@ from enum import Enum
 import os
 from urllib.request import urlretrieve
 import logging
+import traceback
 
 import cv2
 #from basicsr.archs.rrdbnet_arch import RRDBNet
@@ -311,6 +312,7 @@ def upscale():
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return upscaled_image_base64, 200
     except Exception as error:
+            traceback.print_exc()
             logger.exception("Exception Occured while code Execution: " + str(error))
             return repr(error), 500
 
