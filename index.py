@@ -78,9 +78,10 @@ class SuperResolutionType:
     return getattr(self, f'_{str(super_resolution_type)}', lambda image, scale_factor: image)(image, int(scale_factor), denoise_intensity)
 
   def _EDSR(self, image, scale_factor, denoise_intensity):
-    model_path = f'EDSR_x{scale_factor}.pb'
-
-    urlretrieve(f'{self.base_url}/EDSR/{model_path}', model_path)
+    model_name = f'EDSR_x{scale_factor}.pb'
+    model_path = f'./{model_name}'
+    
+    urlretrieve(f'{self.base_url}/EDSR/{model_name}', model_name)
 
     self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("edsr", scale_factor)
