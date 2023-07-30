@@ -3,11 +3,11 @@ from enum import Enum
 
 import cv2
 from cv2 import dnn_superres
-from basicsr.archs.rrdbnet_arch import RRDBNet
+#from basicsr.archs.rrdbnet_arch import RRDBNet
 from flask import Flask, render_template, request, Response
 import numpy as np
-from realesrgan import RealESRGANer
-from realesrgan.archs.srvgg_arch import SRVGGNetCompact
+#from realesrgan import RealESRGANer
+#from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 
 
 app = Flask(__name__)
@@ -64,7 +64,6 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensi
     return cv2.imencode('.png', blurred_image)[1]
 
 
-'''
 class SuperResolutionType:
   def super_resolution(self, super_resolution_type, image, scale_factor=4, denoise_intensity=0):
     self.super_resolution_network = dnn_superres.DnnSuperResImpl_create()
@@ -121,6 +120,7 @@ class SuperResolutionType:
 
     return denoised_image
 
+'''
   def _REAL_ESRGAN_PLUS(self, image, scale_factor, denoise_intensity):
     model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGAN_x{scale_factor}plus.pth'
 
@@ -177,13 +177,14 @@ class SuperResolutionType:
 
     return np.ascontiguousarray(new_image, dtype=np.uint8)    
 
+'''
 def apply_super_resolution(super_resolution_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
     upscaled_image = SuperResolutionType().super_resolution(super_resolution_type, image, scale_factor, denoise_intensity)
 
     blurred_image = apply_blur(blur_type, upscaled_image, blur_intensity)
 
     return blurred_image
-'''
+
 
 @app.route('/')
 def root():
@@ -221,13 +222,12 @@ def upscale():
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return render_template('index.html', image=upscaled_image_base64, show_image='inline')
-'''
     elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
         upscaled_image = apply_super_resolution(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return render_template('index.html', image=upscaled_image_base64, show_image='inline')
-'''
+
     return Response("Tipo de aumento não enviado", status=400)
 
 if __name__ == '__main__':
