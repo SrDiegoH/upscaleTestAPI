@@ -12,6 +12,7 @@ import numpy as np
 #from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 
 app = Flask(__name__)
+
 logger = logging.getLogger()
 
 class BlurType:
@@ -309,10 +310,11 @@ def upscale():
 
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
+
         return upscaled_image_base64, 200
     except Exception as error:
-            logger.exception("Exception Occured while code Execution: " + str(error))
-            return repr(error), 500
+        logger.exception("Exception Occured while code Execution: " + str(error))
+        return repr(error), 500
 
 @app.route('/')
 def root():
