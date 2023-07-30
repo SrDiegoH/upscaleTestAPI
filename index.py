@@ -64,6 +64,7 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensi
     return cv2.imencode('.png', blurred_image)[1]
 
 
+'''
 class SuperResolutionType:
   def super_resolution(self, super_resolution_type, image, scale_factor=4, denoise_intensity=0):
     self.super_resolution_network = dnn_superres.DnnSuperResImpl_create()
@@ -182,7 +183,7 @@ def apply_super_resolution(super_resolution_type, image, scale_factor=4, denoise
     blurred_image = apply_blur(blur_type, upscaled_image, blur_intensity)
 
     return blurred_image
-
+'''
 
 @app.route('/')
 def root():
@@ -220,12 +221,13 @@ def upscale():
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return render_template('index.html', image=upscaled_image_base64, show_image='inline')
+'''
     elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
         upscaled_image = apply_super_resolution(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return render_template('index.html', image=upscaled_image_base64, show_image='inline')
-
+'''
     return Response("Tipo de aumento não enviado", status=400)
 
 if __name__ == '__main__':
