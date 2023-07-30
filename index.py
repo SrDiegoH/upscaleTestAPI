@@ -2,6 +2,7 @@ import base64
 from enum import Enum
 import os
 from urllib.request import urlretrieve
+import logging
 
 import cv2
 #from basicsr.archs.rrdbnet_arch import RRDBNet
@@ -10,7 +11,7 @@ import numpy as np
 #from realesrgan import RealESRGANer
 #from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 
-
+logger = logging.getLogger()
 app = Flask(__name__)
 
 class BlurType:
@@ -310,6 +311,7 @@ def upscale():
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
         return upscaled_image_base64, 200
     except Exception as error:
+            logger.exception("Exception Occured while code Execution: " + str(error))
             return repr(error), 500
 
 @app.route('/')
