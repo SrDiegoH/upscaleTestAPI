@@ -270,44 +270,47 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
 
 
 def upscale():
-    image = request.files.get('image')
+    try:
+        image = request.files.get('image')
 
-    if not image:
-        return 'Imagem não enviada', 400
- 
-    image_bytes = np.fromfile(image, np.uint8)
+        if not image:
+            return 'Imagem não enviada', 400
+    
+        image_bytes = np.fromfile(image, np.uint8)
 
-    raw_scale_factor = request.values.get('scale_factor')
+        raw_scale_factor = request.values.get('scale_factor')
 
-    if not raw_scale_factor:
-        return 'Fator de crescimento não enviado', 400
+        if not raw_scale_factor:
+            return 'Fator de crescimento não enviado', 400
 
-    scale_factor = int(raw_scale_factor.strip())
+        scale_factor = int(raw_scale_factor.strip())
 
-    raw_denoise_intensity = request.values.get('denoise_intensity')
-    denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else 0
+        raw_denoise_intensity = request.values.get('denoise_intensity')
+        denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else 0
 
-    raw_blur_intensity = request.values.get('blur_intensity')
-    blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else 0
+        raw_blur_intensity = request.values.get('blur_intensity')
+        blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else 0
 
-    raw_blur_type = request.values.get('blur_type')
-    blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
+        raw_blur_type = request.values.get('blur_type')
+        blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
 
-    upscale_type = request.values.get('upscale_type')
+        upscale_type = request.values.get('upscale_type')
 
-    if not upscale_type:
-        return 'Tipo de aumento não enviado', 400
+        if not upscale_type:
+            return 'Tipo de aumento não enviado', 400
 
-    if upscale_type in dir(InterpolationType):
-        upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
-        upscaled_image = apply_super_resolution(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    else:
-        return 'Tipo de aumento não conhecido', 400
+        if upscale_type in dir(InterpolationType):
+            upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
+        elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
+            upscaled_image = apply_super_resolution(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
+        else:
+            return 'Tipo de aumento não conhecido', 400
 
-    upscaled_image_bytes = np.array(upscaled_image).tobytes()
-    upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
-    return upscaled_image_base64, 200
+        upscaled_image_bytes = np.array(upscaled_image).tobytes()
+        upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
+        return upscaled_image_base64, 200
+    except Exception as error:
+            return repr(error), 500
 
 @app.route('/')
 def root():
