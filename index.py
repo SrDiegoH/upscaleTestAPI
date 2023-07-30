@@ -86,6 +86,8 @@ class SuperResolutionType:
     self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("edsr", scale_factor)
 
+    image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+
     new_image = self.super_resolution_network.upsample(image)
 
     denoised_image = apply_denoise(new_image, denoise_intensity)
