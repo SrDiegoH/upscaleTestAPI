@@ -81,7 +81,7 @@ class SuperResolutionType:
     model_name = f'EDSR_x{scale_factor}.pb'
     model_path = f'/tmp/{model_name}'
     
-    urlretrieve(f'{self.base_url}/EDSR/{model_name}', model_name)
+    urlretrieve(f'{self.base_url}/EDSR/{model_name}', model_path)
 
     self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("edsr", scale_factor)
