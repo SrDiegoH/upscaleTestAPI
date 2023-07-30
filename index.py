@@ -14,8 +14,10 @@ import numpy as np
 app = Flask(__name__)
 
 class BlurType:
-    def blur(self, image, blut_type, intensity):
-        return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
+    def blur(self, image, blut_type='SIMPLE_BLUR', intensity=.0):
+        is_intensity_odd = intensity % 2 == 1
+        odd_intensity = intensity if is_intensity_odd else intensity + 1
+        return getattr(self, f'_{str(blut_type)}', lambda image, odd_intensity: image)(image, odd_intensity)
 
     def _GAUSSIAN_BLUR(self, image, intensity):
         return cv2.GaussianBlur(image, (intensity, intensity), 0)
@@ -29,10 +31,8 @@ class BlurType:
     def _BILATERAL_FILTER(self, image, intensity):
         return cv2.bilateralFilter(image, intensity, 100, 100)
 
-def apply_blur(image, blur_type='SIMPLE_BLUR', intensity=.0):
-    is_intensity_odd = intensity % 2 == 1
-    odd_intensity = intensity if is_intensity_odd else intensity + 1
-    return BlurType().blur(image, blur_type, odd_intensity)
+def apply_blur(image, blur_type, intensity):
+    return BlurType().blur(image, blur_type, intensity)
 
 
 def apply_denoise(image, intensity=0, template_window=7, search_window=21):
