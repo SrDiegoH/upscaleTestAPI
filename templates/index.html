@@ -41,11 +41,14 @@
                 <option value="8">8 vezes a imagem original</option>
             </select>
             </br>
+            </br>
             <label for="denoise_intensity">Intensidade do removedor do ruido: </label>
             <input name="denoise_intensity" type="number" value="0"/>
             </br>
+            </br>
             <label for="blur_intensity">Intensidade do borrão: </label>
             <input name="blur_intensity" type="number" value="0"/>
+            </br>
             </br>
             <label for="blur_type">Tipo de borrão: </label>
             <select name="blur_type">
@@ -55,8 +58,14 @@
                 <option value="BILATERAL_FILTER">Filtro bilateral</option>
             </select>
             </br>
+            </br>
             <p><input type="submit" value="Processar Imagem"></p>
         </form>
+        </br>
+        </br>
         <img display="{{ show_image }}" src="data:image/png;base64,{{ image }}">
+        </br>
+        </br>
+        <h1 display="{{ show_error }}" >{{ error_message }}</h1>
     </body>
 </html>
