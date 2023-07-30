@@ -27,6 +27,7 @@ class BlurType:
         return cv2.medianBlur(image, intensity)
 
     def _SIMPLE_BLUR(self, image, intensity):
+        print(intensity)
         return cv2.blur(image, (intensity, intensity))
 
     def _BILATERAL_FILTER(self, image, intensity):
