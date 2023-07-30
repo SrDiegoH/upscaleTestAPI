@@ -317,16 +317,16 @@ def root():
 def show_upscaled_image():
     response, code = upscale()
 
-    if code == 400:
-        return render_template('index.html', image='', show_image='none', error_message=response, show_error='inline')
+    if code == 200:
+        return render_template('index.html', image=response, show_image='inline', error_message='', show_error='none')
 
-    return render_template('index.html', image=response, show_image='inline', error_message='', show_error='none')
+    return render_template('index.html', image='', show_image='none', error_message=response, show_error='inline')
 
 @app.route('/upscale', methods=['POST'])
 def return_upscaled_image():
     response, code = upscale()
 
-    return Response(response if code == 400 else f'<img src="data:image/png;base64,{response}">', status=code)
+    return Response(f'<img src="data:image/png;base64,{response}">' if code == 200 else response, status=code)
 
 if __name__ == '__main__':
     is_debug = os.getenv('IS_DEBUG', False)
