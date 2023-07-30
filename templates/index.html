@@ -49,8 +49,7 @@
             </br>
             <label for="blur_type">Tipo de borrão: </label>
             <select name="blur_type">
-                <option value="" disabled selected>Selecione</option>
-                <option value="SIMPLE_BLUR">Borrão Simples</option>
+                <option value="SIMPLE_BLUR" selected>Borrão Simples</option>
                 <option value="MEDIAN_BLUR">Borrão Mediano</option>
                 <option value="GAUSSIAN_BLUR">Borrão Gausiano (distribuição normal)</option>
                 <option value="BILATERAL_FILTER">Filtro bilateral</option>
@@ -58,6 +57,6 @@
             </br>
             <p><input type="submit" value="Processar Imagem"></p>
         </form>
-        <img src="data:image/png;base64,{{ image }}">
+        <img display="{{ show_image }}" src="data:image/png;base64,{{ image }}">
     </body>
 </html>

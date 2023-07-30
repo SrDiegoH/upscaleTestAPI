@@ -1,10 +1,13 @@
 import base64
 from enum import Enum
 
-import numpy as np
 import cv2
-
+from cv2 import dnn_superres
+from basicsr.archs.rrdbnet_arch import RRDBNet
 from flask import Flask, render_template, request, Response
+import numpy as np
+from realesrgan import RealESRGANer
+from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 
 
 app = Flask(__name__)
@@ -60,9 +63,130 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensi
 
     return cv2.imencode('.png', blurred_image)[1]
 
+
+class SuperResolutionType:
+  def super_resolution(self, super_resolution_type, image, scale_factor=4, denoise_intensity=0):
+    self.super_resolution_network = dnn_superres.DnnSuperResImpl_create()
+
+    return getattr(self, f'_{str(super_resolution_type)}', lambda image, scale_factor: image)(image, int(scale_factor), denoise_intensity)
+
+  def _EDSR(self, image, scale_factor, denoise_intensity):
+    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/EDSR/EDSR_x{scale_factor}.pb'
+
+    self.super_resolution_network.readModel(model)
+    self.super_resolution_network.setModel("edsr", scale_factor)
+
+    denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    return denoised_image
+
+  def _ESPCN(self, image, scale_factor, denoise_intensity):
+    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESPCN/ESPCN_x{scale_factor}.pb'
+
+    self.super_resolution_network.readModel(model)
+    self.super_resolution_network.setModel("espcn", scale_factor)
+
+    denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    return denoised_image
+
+  def _FSRCNN_SMALL(self, image, scale_factor, denoise_intensity):
+    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/FSRCNN/FSRCNN-small_x{scale_factor}.pb'
+
+    self.super_resolution_network.readModel(model)
+    self.super_resolution_network.setModel("fsrcnn", scale_factor)
+
+    denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    return denoised_image
+
+  def _FSRCNN(self, image, scale_factor, denoise_intensity):
+    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/FSRCNN/FSRCNN_x{scale_factor}.pb'
+
+    self.super_resolution_network.readModel(model)
+    self.super_resolution_network.setModel("fsrcnn", scale_factor)
+
+    denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    return denoised_image
+
+  def _LAPSRN(self, image, scale_factor, denoise_intensity):
+    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/LapSRN/LapSRN_x{scale_factor}.pb'
+
+    self.super_resolution_network.readModel(model)
+    self.super_resolution_network.setModel("lapsrn", scale_factor)
+
+    denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    return denoised_image
+
+  def _REAL_ESRGAN_PLUS(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGAN_x{scale_factor}plus.pth'
+
+    model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=scale_factor)
+    new_image, _ = RealESRGANer(scale=scale_factor, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=scale_factor)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESRGAN_PLUS_ANIME_6B(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGAN_x4plus_anime_6B.pth'
+
+    model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=6, num_grow_ch=32, scale=4)
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESRGAN_NET(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRNet_x4plus.pth'
+
+    model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESR_ANIME_VIDEO(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGANv2-animevideo-xsx{scale_factor}.pth'
+
+    model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=16, upscale=scale_factor, act_type='prelu')
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=scale_factor)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESR_ANIME_VIDEO_V3(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-animevideov3.pth'
+  
+    model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=16, upscale=4, act_type='prelu')
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESR_GENERAL(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-general-x4v3.pth'
+
+    model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
+
+  def _REAL_ESR_GENERAL_WDN(self, image, scale_factor, denoise_intensity):
+    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-general-wdn-x4v3.pth'
+
+    model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
+    new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)    
+
+def apply_super_resolution(super_resolution_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
+    upscaled_image = SuperResolutionType().super_resolution(super_resolution_type, image, scale_factor, denoise_intensity)
+
+    blurred_image = apply_blur(blur_type, upscaled_image, blur_intensity)
+
+    return blurred_image
+
+
 @app.route('/')
 def root():
-    return render_template('index.html', image='')
+    return render_template('index.html', image='', show_image='block')
 
 @app.route('/', methods=['POST'])
 def upscale():
@@ -95,9 +219,14 @@ def upscale():
         upscaled_image = apply_upscale(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
-        return render_template('index.html', image=upscaled_image_base64)
+        return render_template('index.html', image=upscaled_image_base64, show_image='inline')
+    elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
+        upscaled_image = apply_super_resolution(upscale_type, image_bytes, scale_factor, denoise_intensity, blur_intensity, blur_type)
+        upscaled_image_bytes = np.array(upscaled_image).tobytes()
+        upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
+        return render_template('index.html', image=upscaled_image_base64, show_image='inline')
 
     return Response("Tipo de aumento não enviado", status=400)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
