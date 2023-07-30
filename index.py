@@ -1,5 +1,7 @@
 import base64
 from enum import Enum
+import os
+from urllib.request import urlretrieve
 
 import cv2
 from cv2 import dnn_superres
@@ -64,118 +66,171 @@ def apply_upscale(interpolation_type, image_bytes, scale_factor, denoise_intensi
     return cv2.imencode('.png', blurred_image)[1]
 
 
+def delete_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
 class SuperResolutionType:
   def super_resolution(self, super_resolution_type, image, scale_factor=4, denoise_intensity=0):
     self.super_resolution_network = dnn_superres.DnnSuperResImpl_create()
+    self.base_url = 'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models'
 
     return getattr(self, f'_{str(super_resolution_type)}', lambda image, scale_factor: image)(image, int(scale_factor), denoise_intensity)
 
   def _EDSR(self, image, scale_factor, denoise_intensity):
-    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/EDSR/EDSR_x{scale_factor}.pb'
+    model_path = f'EDSR_x{scale_factor}.pb'
 
-    self.super_resolution_network.readModel(model)
+    urlretrieve(f'{self.base_url}/EDSR/{model_path}', model_path)
+
+    self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("edsr", scale_factor)
 
     denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
 
+    delete_file(model_path)
+
     return denoised_image
 
   def _ESPCN(self, image, scale_factor, denoise_intensity):
-    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESPCN/ESPCN_x{scale_factor}.pb'
+    model_path = f'ESPCN_x{scale_factor}.pb'
 
-    self.super_resolution_network.readModel(model)
+    urlretrieve(f'{self.base_url}/ESPCN/{model_path}', model_path)
+
+    self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("espcn", scale_factor)
 
     denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
 
+    delete_file(model_path)
+
     return denoised_image
 
   def _FSRCNN_SMALL(self, image, scale_factor, denoise_intensity):
-    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/FSRCNN/FSRCNN-small_x{scale_factor}.pb'
+    model_path = f'FSRCNN-small_x{scale_factor}.pb'
 
-    self.super_resolution_network.readModel(model)
+    urlretrieve(f'{self.base_url}/FSRCNN/{model_path}', model_path)
+
+    self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("fsrcnn", scale_factor)
 
     denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    delete_file(model_path)
 
     return denoised_image
 
   def _FSRCNN(self, image, scale_factor, denoise_intensity):
-    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/FSRCNN/FSRCNN_x{scale_factor}.pb'
+    model_path = f'FSRCNN_x{scale_factor}.pb'
 
-    self.super_resolution_network.readModel(model)
+    urlretrieve(f'{self.base_url}/FSRCNN/{model_path}', model_path)
+
+    self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("fsrcnn", scale_factor)
 
     denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
 
+    delete_file(model_path)
+
     return denoised_image
 
   def _LAPSRN(self, image, scale_factor, denoise_intensity):
-    model = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/LapSRN/LapSRN_x{scale_factor}.pb'
+    model_path = f'LapSRN_x{scale_factor}.pb'
 
-    self.super_resolution_network.readModel(model)
+    urlretrieve(f'{self.base_url}/LapSRN/{model_path}', model_path)
+
+    self.super_resolution_network.readModel(model_path)
     self.super_resolution_network.setModel("lapsrn", scale_factor)
 
     denoised_image = apply_denoise(self.super_resolution_network.upsample(image), denoise_intensity)
+
+    delete_file(model_path)
 
     return denoised_image
 
 '''
   def _REAL_ESRGAN_PLUS(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGAN_x{scale_factor}plus.pth'
+    model_path = f'RealESRGAN_x{scale_factor}plus.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=scale_factor)
     new_image, _ = RealESRGANer(scale=scale_factor, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=scale_factor)
 
+    delete_file(model_path)
+
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESRGAN_PLUS_ANIME_6B(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGAN_x4plus_anime_6B.pth'
+    model_path = f'RealESRGAN_x4plus_anime_6B.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=6, num_grow_ch=32, scale=4)
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
 
+    delete_file(model_path)
+
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESRGAN_NET(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRNet_x4plus.pth'
+    model_path = f'RealESRNet_x4plus.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
 
+    delete_file(model_path)
+
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESR_ANIME_VIDEO(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/RealESRGANv2-animevideo-xsx{scale_factor}.pth'
+    model_path = f'RealESRGANv2-animevideo-xsx{scale_factor}.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=16, upscale=scale_factor, act_type='prelu')
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=scale_factor)
 
+    delete_file(model_path)
+
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESR_ANIME_VIDEO_V3(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-animevideov3.pth'
+    model_path = f'realesr-animevideov3.pth'
   
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
+
     model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=16, upscale=4, act_type='prelu')
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    delete_file(model_path)
 
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESR_GENERAL(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-general-x4v3.pth'
+    model_path = f'realesr-general-x4v3.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
+
+    delete_file(model_path)
 
     return np.ascontiguousarray(new_image, dtype=np.uint8)
 
   def _REAL_ESR_GENERAL_WDN(self, image, scale_factor, denoise_intensity):
-    model_path = f'https://raw.githubusercontent.com/SrDiegoH/upscaleTestResources/main/resources/models/ESRGAN/realesr-general-wdn-x4v3.pth'
+    model_path = f'realesr-general-wdn-x4v3.pth'
+
+    urlretrieve(f'{self.base_url}/ESRGAN/{model}', model)
 
     model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
     new_image, _ = RealESRGANer(scale=4, model_path=model_path, dni_weight=denoise_intensity/10, model=model).enhance(image, outscale=4)
 
-    return np.ascontiguousarray(new_image, dtype=np.uint8)    
+    delete_file(model_path)
+
+    return np.ascontiguousarray(new_image, dtype=np.uint8)
 
 '''
 def apply_super_resolution(super_resolution_type, image, scale_factor=4, denoise_intensity=0, blur_intensity=0, blur_type='SIMPLE_BLUR'):
