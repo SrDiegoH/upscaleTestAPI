@@ -79,7 +79,7 @@ class SuperResolutionType:
 
   def _EDSR(self, image, scale_factor, denoise_intensity):
     model_name = f'EDSR_x{scale_factor}.pb'
-    model_path = f'./{model_name}'
+    model_path = f'./EDSR/{model_name}'
     
     urlretrieve(f'{self.base_url}/EDSR/{model_name}', model_name)
 
