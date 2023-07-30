@@ -29,7 +29,7 @@ class BlurType:
     def _BILATERAL_FILTER(self, image, intensity):
         return cv2.bilateralFilter(image, intensity, 100, 100)
 
-def apply_blur(image, blur_type=0, intensity='SIMPLE_BLUR'):
+def apply_blur(image, blur_type='SIMPLE_BLUR', intensity=0):
     is_intensity_odd = intensity % 2 == 1
     odd_intensity = intensity if is_intensity_odd else intensity + 1
     return BlurType().blur(image, blur_type, odd_intensity)
