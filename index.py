@@ -14,12 +14,11 @@ import numpy as np
 app = Flask(__name__)
 
 class BlurType:
-    def blur(self, image, blut_type='SIMPLE_BLUR', intensity=.0):
-        is_intensity_odd = intensity % 2 == 1
+    def blur(self, image, blut_type='SIMPLE_BLUR', intensity=0):
+        is_odd = intensity % 2 == 1
+        intensity = intensity if is_odd or intensity == 0 else intensity + 1
 
-        odd_intensity = intensity if is_intensity_odd else intensity + 1
- 
-        return getattr(self, f'_{str(blut_type)}', lambda image, odd_intensity: image)(image, odd_intensity)
+        return getattr(self, f'_{str(blut_type)}', lambda image, intensity: image)(image, intensity)
 
     def _GAUSSIAN_BLUR(self, image, intensity):
         return cv2.GaussianBlur(image, (intensity, intensity), 0)
@@ -283,10 +282,10 @@ def upscale():
     scale_factor = int(raw_scale_factor.strip())
 
     raw_denoise_intensity = request.values.get('denoise_intensity')
-    denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else None
+    denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else 0
 
     raw_blur_intensity = request.values.get('blur_intensity')
-    blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else None
+    blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else 0
 
     raw_blur_type = request.values.get('blur_type')
     blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
