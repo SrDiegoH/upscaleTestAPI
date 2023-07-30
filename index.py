@@ -16,7 +16,9 @@ app = Flask(__name__)
 class BlurType:
     def blur(self, image, blut_type='SIMPLE_BLUR', intensity=.0):
         is_intensity_odd = intensity % 2 == 1
+
         odd_intensity = intensity if is_intensity_odd else intensity + 1
+ 
         return getattr(self, f'_{str(blut_type)}', lambda image, odd_intensity: image)(image, odd_intensity)
 
     def _GAUSSIAN_BLUR(self, image, intensity):
