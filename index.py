@@ -276,6 +276,7 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
+        print(f'----> Upscale type: {upscale_type}')
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
@@ -283,6 +284,7 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_in
         else:
             raise Exception('Tipo de aumento não conhecido')
 
+        print(f'----> Upscaled image: {upscaled_image}')
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
 
@@ -321,15 +323,14 @@ def upscale():
 
     random_uuid = str(uuid.uuid4())
 
-    #with app.app_context():
     #_thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
-    process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    """
+    #process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    #"""
     threading.Thread(
         target=process_and_save_on_cache,
         args=(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor),
     ).start()
-    """
+    #"""
 
     return random_uuid, 201
 
