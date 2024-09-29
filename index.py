@@ -374,7 +374,7 @@ def delete_cache():
 
 @app.route('/')
 def root():
-    retrived_uuid = request.values.get('uuid')
+    retrived_uuid = request.args.get('uuid')
     print(f'---------> UUID: {retrived_uuid}')
     if retrived_uuid:
         cached_data = read_cache(retrived_uuid)
@@ -401,7 +401,7 @@ def upscale_image():
 
 @app.route('/', methods=['PUT'])
 def retrive_image():
-    retrived_uuid = request.values.get('uuid')
+    retrived_uuid = request.args.get('uuid')
 
     cached_data = read_cache(retrived_uuid)
 
