@@ -384,7 +384,7 @@ def upscale_image():
 
     return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
-@app.route('/', methods=['PATCH'])
+@app.route('/', methods=['PUT'])
 def retrive_image():
     retrived_uuid = request.values.get('uuid')
 
@@ -399,7 +399,6 @@ def retrive_image():
        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
 
     return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
-
 
 #@app.route('/upscale', methods=['POST'])
 #def return_upscaled_image():
