@@ -1,6 +1,5 @@
 import base64
 import json
-import logging
 import os
 import uuid
 import _thread
@@ -16,8 +15,6 @@ from flask import Flask, render_template, request, Response
 # from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 
 app = Flask(__name__)
-
-logger = logging.getLogger()
 
 CACHE_FILE = '/tmp/cache.txt'
 CACHE_EXPIRY = timedelta(days=1)
@@ -326,8 +323,6 @@ def upscale(random_uuid):
 
         write_to_cache(random_uuid, f'ERROR: {error_message}')
 
-        logger.exception(f'Exception Occured while code Execution: {error_message}')
-
         return repr(error), 500
 
 def read_cache(cache_uuid):
@@ -336,7 +331,7 @@ def read_cache(cache_uuid):
 
     control_clean_cache = False
 
-    #logger.info(f'Reading cache')
+    #print(f'Reading cache')
     with open(CACHE_FILE, 'r') as cache_file:
         for line in cache_file:
             if not line.startswith(cache_uuid):
@@ -347,7 +342,7 @@ def read_cache(cache_uuid):
             cached_date = datetime.strptime(cached_datetime, '%Y-%m-%d %H:%M:%S')
 
             if datetime.now() - cached_date <= CACHE_EXPIRY:
-                #logger.info(f'Finished read')
+                #print(f'Finished read')
                 return json.loads(data.replace("'", '"'))
 
             control_clean_cache = True
@@ -359,7 +354,7 @@ def read_cache(cache_uuid):
     return None
 
 def clear_cache(cache_uuid):
-    #logger.info(f'Cleaning cache')
+    #print(f'Cleaning cache')
     with open(CACHE_FILE, 'r') as cache_file:
         lines = cache_file.readlines()
 
@@ -367,7 +362,7 @@ def clear_cache(cache_uuid):
         for line in lines:
             if not line.startswith(cache_uuid):
                 cache_file.write(line)
-    #logger.info(f'Cleaned')
+    #print(f'Cleaned')
 
 def write_to_cache(cache_uuid, data):
     with open(CACHE_FILE, 'a') as cache_file:
@@ -395,7 +390,7 @@ def retrive_image():
 
     cached_data = read_cache(retrived_uuid)
 
-    logger.info(f'Cached Data: {cached_data}')
+    print(f'Cached Data: {cached_data}')
 
     if not cached_data:
         return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
