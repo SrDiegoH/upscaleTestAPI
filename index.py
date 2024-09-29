@@ -375,11 +375,11 @@ def delete_cache():
 @app.route('/')
 def root():
     retrived_uuid = request.values.get('uuid')
-    print(f'UUID: {retrived_uuid}')
+    print(f'---------> UUID: {retrived_uuid}')
     if retrived_uuid:
         cached_data = read_cache(retrived_uuid)
 
-        print(f'Cached Data: {cached_data}')
+        print(f'---------> Cached Data: {cached_data}')
 
         if not cached_data:
             return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
@@ -405,7 +405,7 @@ def retrive_image():
 
     cached_data = read_cache(retrived_uuid)
 
-    print(f'Cached Data: {cached_data}')
+    print(f'---------> Cached Data: {cached_data}')
 
     if not cached_data:
         return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
