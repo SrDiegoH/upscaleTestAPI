@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 import os
 import uuid
@@ -388,7 +389,7 @@ def upscale_image():
 
     return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
-@app.route('/retrive', methods=['GET'])
+@app.route('/', methods=['PATCH'])
 def retrive_image():
     retrived_uuid = request.values.get('uuid')
 
