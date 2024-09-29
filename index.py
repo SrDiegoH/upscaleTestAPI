@@ -279,6 +279,7 @@ def upscale(random_uuid):
     try:
         image = request.files.get('image')
 
+        print(f'---------> UUID: {random_uuid}, image is filled? {True if image else False}')
         if not image:
             return 'Imagem não enviada', 400
     
@@ -286,6 +287,7 @@ def upscale(random_uuid):
 
         raw_scale_factor = request.values.get('scale_factor')
 
+        print(f'---------> scale factor: {raw_scale_factor}')
         if not raw_scale_factor:
             return 'Fator de crescimento não enviado', 400
 
@@ -302,6 +304,7 @@ def upscale(random_uuid):
 
         upscale_type = request.values.get('upscale_type')
 
+        print(f'---------> upscale type: {upscale_type}')
         if not upscale_type:
             return 'Tipo de aumento não enviado', 400
 
@@ -315,12 +318,15 @@ def upscale(random_uuid):
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
 
+        print(f'---------> upscaled image: {upscaled_image_base64}')
         write_to_cache(random_uuid, upscaled_image_base64)
 
+        print(f'---------> Saved')
         return f'Salvo na cache com UUID: {random_uuid}', 200
     except Exception as error:
         error_message = str(error)
 
+        print(f'---------> ERROR: {error_message}')
         write_to_cache(random_uuid, f'ERROR: {error_message}')
 
         return repr(error), 500
@@ -386,9 +392,9 @@ def upscale_image():
 
 @app.route('/', methods=['PUT'])
 def retrive_image():
-    retrived_uuid = request.args.get('uuid')
+    search_uuid = request.values.get('search_uuid')
 
-    cached_data = read_cache(retrived_uuid)
+    cached_data = read_cache(search_uuid)
 
     print(f'---------> Cached Data: {cached_data}')
 
