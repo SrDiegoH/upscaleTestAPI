@@ -269,7 +269,6 @@ def apply_upscale(interpolation_type, image_bytes, denoise_intensity, blur_inten
     blurred_image = apply_blur(denoised_image, blur_type, blur_intensity)
     print(f'----> Blurred image: {blurred_image}')
 
-    print(f'----> Encoding image: {cv2.imencode('.png', blurred_image)[1]}')
     return cv2.imencode('.png', blurred_image)[1]
 
 def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur_intensity, blur_type, scale_factor):
