@@ -379,7 +379,7 @@ def delete_cache():
 
 @app.route('/')
 def root():
-    return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='', show_error='none')
+    return render_template('index.html', uuid_message='', show_uuid='none')
 
 @app.route('/', methods=['POST'])
 def upscale_image():
@@ -387,21 +387,21 @@ def upscale_image():
 
     _thread.start_new_thread(upscale, (random_uuid,))
 
-    return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
+    return render_template('index.html', uuid_message=random_uuid, show_uuid='inline')
 
-@app.route('/', methods=['PATCH'])
+@app.route('/retrive', methods=['GET'])
 def retrive_image():
     retrived_uuid = request.values.get('uuid')
 
     cached_data = read_cache(retrived_uuid)
-
+    logger.info(f'Cached Data: {cached_data}')
     if not cached_data:
-        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
+        return render_template('retrive.html', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
 
     if cached_data.startswith('ERROR'):
-       return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
+       return render_template('retrive.html', image='', show_image='none', error_message='cached_data', show_error='inline')
 
-    return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
+    return render_template('retrive.html', image=cached_data, show_image='inline', error_message='', show_error='none')
 
 
 #@app.route('/upscale', methods=['POST'])
