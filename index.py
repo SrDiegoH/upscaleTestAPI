@@ -300,7 +300,7 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_in
 
         write_to_cache(random_uuid, upscaled_image_base64)
     except Exception as error:
-        print(f'----> Error on upscale image: {error}')
+        print(f'----> Error on upscale image: {str(error)}')
         write_to_cache(random_uuid, f'ERROR: {str(error)}')
 
 def upscale():
