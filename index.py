@@ -2,7 +2,7 @@ import base64
 import json
 import os
 import uuid
-import _thread
+import threading
 from datetime import datetime, timedelta
 from enum import Enum
 from urllib.request import urlretrieve
@@ -322,7 +322,11 @@ def upscale():
     random_uuid = str(uuid.uuid4())
 
     #with app.app_context():
-    _thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
+    #_thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
+    threading.Thread(
+        target=process_and_save_on_cache,
+        args=(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor),
+    ).start()
 
     return random_uuid, 201
 
@@ -362,7 +366,7 @@ def read_cache(cache_uuid):
     return None
 
 def clear_cache(cache_uuid):
-    print(f'Cleaning cache')
+    print(f'-----> Cleaning cache')
     with open(CACHE_FILE, 'r') as cache_file:
         lines = cache_file.readlines()
 
@@ -370,9 +374,10 @@ def clear_cache(cache_uuid):
         for line in lines:
             if not line.startswith(cache_uuid):
                 cache_file.write(line)
-    print(f'Cleaned')
+    print(f'-----> Cleaned')
 
 def write_to_cache(cache_uuid, data):
+    print(f'---> Cleaning cache')
     with open(CACHE_FILE, 'a') as cache_file:
         cache_file.write(f'{cache_uuid}#@#{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}#@#{data}\n')
 
