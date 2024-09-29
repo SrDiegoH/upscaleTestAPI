@@ -66,7 +66,7 @@
         <h4 style="display:{{ show_uuid }}">Aguarde 5 minutos e busque pelo UUID: {{ uuid_message }}</h4>
         </br>
         </br>
-        <form method="POST" action="/" enctype="multipart/form-data">
+        <form method="GET" action="/retrive" enctype="multipart/form-data">
             <label for="search_uuid">Busque a imagem por UUID:</label>
             <input name="search_uuid" type="search"/>
             </br>

@@ -275,7 +275,7 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
     return blurred_image
 
 
-def upscale(random_uuid):
+def upscale(random_uuid, request):
     try:
         image = request.files.get('image')
 
@@ -384,29 +384,14 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale_image():
-    search_uuid = request.values.get('search_uuid')
-
-    if search_uuid:
-        cached_data = read_cache(search_uuid)
-
-        print(f'---------> Cached Data: {cached_data}')
-
-        if not cached_data:
-            return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
-
-        if cached_data.startswith('ERROR'):
-        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
-
-        return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
-
     random_uuid = str(uuid.uuid4())
 
     with app.app_context():
-        _thread.start_new_thread(upscale, (random_uuid,))
+        _thread.start_new_thread(upscale, (random_uuid, request))
 
     return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
-@app.route('/', methods=['PUT'])
+@app.route('/retrive', methods=['GET'])
 def retrive_image():
     search_uuid = request.values.get('search_uuid')
 
@@ -415,12 +400,12 @@ def retrive_image():
     print(f'---------> Cached Data: {cached_data}')
 
     if not cached_data:
-        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
+        return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
 
     if cached_data.startswith('ERROR'):
-       return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
+       return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
 
-    return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
+    return render_template('retrive.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
 
 #@app.route('/upscale', methods=['POST'])
 #def return_upscaled_image():
