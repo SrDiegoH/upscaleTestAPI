@@ -288,14 +288,10 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_in
 
         write_to_cache(random_uuid, upscaled_image_base64)
     except Exception as error:
-        print(f'---------> ERROR: {str(error)}')
-
         write_to_cache(random_uuid, f'ERROR: {str(error)}')
 
 def upscale():
     image = request.files.get('image')
-
-    print(f'---------> Was image sent? {True if image else False}')
 
     if not image:
         return 'Imagem não enviada', 400
@@ -303,8 +299,6 @@ def upscale():
     image_bytes = np.fromfile(image, np.uint8)
 
     raw_scale_factor = request.values.get('scale_factor')
-
-    print(f'---------> scale factor: {raw_scale_factor}')
 
     if not raw_scale_factor:
         return 'Fator de crescimento não enviado', 400
@@ -322,8 +316,6 @@ def upscale():
 
     upscale_type = request.values.get('upscale_type')
 
-    print(f'---------> upscale type: {upscale_type}')
-
     if not upscale_type:
         return 'Tipo de aumento não enviado', 400
 
@@ -332,20 +324,22 @@ def upscale():
     #with app.app_context():
     _thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
 
-    print(f'---------> Saved: {random_uuid}')
-
     return random_uuid, 201
 
 
 def read_cache(cache_uuid):
+    print(f'----> Reading cache')
+    print(f'----> Does file exists? {os.path.exists(CACHE_FILE)}')
+
     if not os.path.exists(CACHE_FILE):
         return None
 
     control_clean_cache = False
 
-    print(f'Reading cache')
+    print(f'----> Opening cache file')
     with open(CACHE_FILE, 'r') as cache_file:
         for line in cache_file:
+            print(f'-----> Line: {line}')
             if not line.startswith(cache_uuid):
                 continue
 
@@ -353,13 +347,15 @@ def read_cache(cache_uuid):
 
             cached_date = datetime.strptime(cached_datetime, '%Y-%m-%d %H:%M:%S')
 
+            print(f'-----> Cache date: {cached_date}, is expired? {datetime.now() - cached_date <= CACHE_EXPIRY}')
             if datetime.now() - cached_date <= CACHE_EXPIRY:
-                print(f'Finished read')
+                print(f'------> Finished read, cache found: {data}')
                 return json.loads(data.replace("'", '"'))
 
             control_clean_cache = True
             break
 
+    print(f'----> Cleaning cache? {control_clean_cache}')
     if control_clean_cache:
         clear_cache(cache_uuid)
 
@@ -396,12 +392,15 @@ def upscale_image():
 
 @app.route('/retrive', methods=['GET'])
 def retrive_image():
-    print(f'---------> Call retrive')
+    print(f'---> Call retrive')
+
     search_uuid = request.args.get('search_uuid')
+
+    print(f'---> Search Uuid: {search_uuid}')
 
     cached_data = read_cache(search_uuid)
 
-    print(f'---------> Cached Data: {cached_data}')
+    print(f'---> Cached Data: {cached_data}')
 
     with app.app_context():
         if not cached_data:
