@@ -3,22 +3,24 @@
     <head>
         <title>Upscale Experiment</title>
         <script>
-            let seconds = 0;
-            let timerInterval;
-        
-            function startTimer() {
-                clearInterval(timerInterval);
+            let seconds = 300 // 5 minutos
+            let timerInterval
 
-                seconds = 0;
+            function startTimer() {
+                clearInterval(timerInterval)
 
                 timerInterval = setInterval(() => {
-                    seconds++;
+                    if (seconds <= 0) {
+                        clearInterval(timerInterval)
+                        return
+                    }
 
-                    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-                    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-                    const secs = String(seconds % 60).padStart(2, '0');
+                    seconds--;
 
-                    document.getElementById('timer').textContent = `${hours}:${minutes}:${secs}`;
+                    const minutes = String(Math.floor(seconds / 60)).padStart(2, '0')
+                    const secs = String(seconds % 60).padStart(2, '0')
+
+                    document.getElementById('timer').textContent = `${minutes}:${secs}`
                 }, 1000);
             }
         </script>
@@ -84,7 +86,7 @@
         </br>
         </br>
         <h4 style="display:{{ show_uuid }}">Aguarde alguns minutos e busque pelo UUID: {{ uuid_message }}</h4>
-        <div id="timer" style="display:{{ show_uuid }}">00:00:00</div>
+        <div id="timer" style="display:{{ show_uuid }}">00:00</div>
         </br>
         </br>
         <form method="GET" action="/retrive" enctype="multipart/form-data">
