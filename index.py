@@ -305,7 +305,8 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_in
         write_to_cache(random_uuid, f'ERROR: {str(error)}')
 
 def upscale():
-    image = request.files.get('image').read()
+    #image = request.files.get('image').read()
+    image = request.files['image'].read()
 
     print(f'Image: {image}')
     if not image:
