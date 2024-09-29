@@ -2,28 +2,6 @@
 <html>
     <head>
         <title>Upscale Experiment</title>
-        <script>
-            let seconds = 300; // 5 minutos
-            let timerInterval;
-
-            function startCountdown() {
-                clearInterval(timerInterval);
-
-                timerInterval = setInterval(() => {
-                    if (seconds <= 0) {
-                        clearInterval(timerInterval);
-                        return;
-                    }
-
-                    seconds--;
-
-                    const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
-                    const secs = String(seconds % 60).padStart(2, '0');
-
-                    document.getElementById('timer').textContent = `${minutes}:${secs}`;
-                }, 1000);
-            }
-        </script>
     </head>
     <body>
         <form method="POST" action="/" enctype="multipart/form-data">
@@ -86,9 +64,6 @@
         </br>
         </br>
         <h4 style="display:{{ show_uuid }}">Aguarde alguns minutos e busque pelo UUID: {{ uuid_message }}</h4>
-        </br>
-        </br>
-        <div id="timer" style="display:{{ show_uuid }}">05:00</div>
         </br>
         </br>
         <form method="GET" action="/retrive" enctype="multipart/form-data">
