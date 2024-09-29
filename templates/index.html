@@ -2,6 +2,26 @@
 <html>
     <head>
         <title>Upscale Experiment</title>
+        <script>
+            let seconds = 0;
+            let timerInterval;
+        
+            function startTimer() {
+                clearInterval(timerInterval);
+
+                seconds = 0;
+
+                timerInterval = setInterval(() => {
+                    seconds++;
+
+                    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(seconds % 60).padStart(2, '0');
+
+                    document.getElementById('timer').textContent = `${hours}:${minutes}:${secs}`;
+                }, 1000);
+            }
+        </script>
     </head>
     <body>
         <form method="POST" action="/" enctype="multipart/form-data">
@@ -59,11 +79,12 @@
             </select>
             </br>
             </br>
-            <p><input type="submit" value="Processar Imagem"/></p>
+            <p><input type="submit" value="Processar Imagem" onclick="startTimer()"/></p>
         </form>
         </br>
         </br>
-        <h4 style="display:{{ show_uuid }}">Aguarde 5 minutos e busque pelo UUID: {{ uuid_message }}</h4>
+        <h4 style="display:{{ show_uuid }}">Aguarde alguns minutos e busque pelo UUID: {{ uuid_message }}</h4>
+        <div id="timer">00:00:00</div>
         </br>
         </br>
         <form method="GET" action="/retrive" enctype="multipart/form-data">
