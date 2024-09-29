@@ -276,7 +276,7 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        print(f'----> Upscale type: {upscale_type}')
+        print(f'----> Upscale type: {upscale_type} - {dir(InterpolationType)}')
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
