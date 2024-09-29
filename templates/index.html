@@ -6,7 +6,7 @@
             let seconds = 300; // 5 minutos
             let timerInterval;
 
-            function startTimer() {
+            function startCountdown() {
                 clearInterval(timerInterval);
 
                 timerInterval = setInterval(() => {
@@ -81,14 +81,14 @@
             </select>
             </br>
             </br>
-            <p><input type="submit" value="Processar Imagem" onclick="startTimer()"/></p>
+            <p><input type="submit" value="Processar Imagem" onclick="startCountdown()"/></p>
         </form>
         </br>
         </br>
         <h4 style="display:{{ show_uuid }}">Aguarde alguns minutos e busque pelo UUID: {{ uuid_message }}</h4>
         </br>
         </br>
-        <div id="timer" style="display:{{ show_uuid }}">00:00</div>
+        <div id="timer" style="display:{{ show_uuid }}">05:00</div>
         </br>
         </br>
         <form method="GET" action="/retrive" enctype="multipart/form-data">
