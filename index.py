@@ -274,62 +274,67 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
 
     return blurred_image
 
-
-def upscale(random_uuid, request):
+def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        image = request.files.get('image')
-
-        print(f'---------> UUID: {random_uuid}, image is filled? {True if image else False}')
-        if not image:
-            return 'Imagem não enviada', 400
-    
-        image_bytes = np.fromfile(image, np.uint8)
-
-        raw_scale_factor = request.values.get('scale_factor')
-
-        print(f'---------> scale factor: {raw_scale_factor}')
-        if not raw_scale_factor:
-            return 'Fator de crescimento não enviado', 400
-
-        scale_factor = int(raw_scale_factor.strip())
-
-        raw_denoise_intensity = request.values.get('denoise_intensity')
-        denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else 0
-
-        raw_blur_intensity = request.values.get('blur_intensity')
-        blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else 0
-
-        raw_blur_type = request.values.get('blur_type')
-        blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
-
-        upscale_type = request.values.get('upscale_type')
-
-        print(f'---------> upscale type: {upscale_type}')
-        if not upscale_type:
-            return 'Tipo de aumento não enviado', 400
-
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
             upscaled_image = apply_super_resolution(upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
         else:
-            return 'Tipo de aumento não conhecido', 400
+            raise Exception('Tipo de aumento não conhecido')
 
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
 
-        print(f'---------> upscaled image: {upscaled_image_base64}')
         write_to_cache(random_uuid, upscaled_image_base64)
-
-        print(f'---------> Saved')
-        return f'Salvo na cache com UUID: {random_uuid}', 200
     except Exception as error:
-        error_message = str(error)
+        print(f'---------> ERROR: {str(error)}')
 
-        print(f'---------> ERROR: {error_message}')
-        write_to_cache(random_uuid, f'ERROR: {error_message}')
+        write_to_cache(random_uuid, f'ERROR: {str(error)}')
 
-        return repr(error), 500
+def upscale():
+    image = request.files.get('image')
+
+    print(f'---------> Was image sent? {True if image else False}')
+
+    if not image:
+        return 'Imagem não enviada', 400
+
+    image_bytes = np.fromfile(image, np.uint8)
+
+    raw_scale_factor = request.values.get('scale_factor')
+
+    print(f'---------> scale factor: {raw_scale_factor}')
+
+    if not raw_scale_factor:
+        return 'Fator de crescimento não enviado', 400
+
+    scale_factor = int(raw_scale_factor.strip())
+
+    raw_denoise_intensity = request.values.get('denoise_intensity')
+    denoise_intensity = int(raw_denoise_intensity.strip()) if raw_denoise_intensity else 0
+
+    raw_blur_intensity = request.values.get('blur_intensity')
+    blur_intensity = int(raw_blur_intensity.strip()) if raw_blur_intensity else 0
+
+    raw_blur_type = request.values.get('blur_type')
+    blur_type = raw_blur_type.strip() if raw_blur_type and f'_{raw_blur_type.strip()}' in dir(BlurType) else None
+
+    upscale_type = request.values.get('upscale_type')
+
+    print(f'---------> upscale type: {upscale_type}')
+
+    if not upscale_type:
+        return 'Tipo de aumento não enviado', 400
+
+    random_uuid = str(uuid.uuid4())
+
+    #with app.app_context():
+    _thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
+
+    print(f'---------> Saved: {random_uuid}')
+
+    return random_uuid, 201
 
 def read_cache(cache_uuid):
     if not os.path.exists(CACHE_FILE):
@@ -337,7 +342,7 @@ def read_cache(cache_uuid):
 
     control_clean_cache = False
 
-    #print(f'Reading cache')
+    print(f'Reading cache')
     with open(CACHE_FILE, 'r') as cache_file:
         for line in cache_file:
             if not line.startswith(cache_uuid):
@@ -348,7 +353,7 @@ def read_cache(cache_uuid):
             cached_date = datetime.strptime(cached_datetime, '%Y-%m-%d %H:%M:%S')
 
             if datetime.now() - cached_date <= CACHE_EXPIRY:
-                #print(f'Finished read')
+                print(f'Finished read')
                 return json.loads(data.replace("'", '"'))
 
             control_clean_cache = True
@@ -384,28 +389,30 @@ def root():
 
 @app.route('/', methods=['POST'])
 def upscale_image():
-    random_uuid = str(uuid.uuid4())
+    response, status = upscale()
 
-    with app.app_context():
-        _thread.start_new_thread(upscale, (random_uuid, request))
+    if status == 400:
+        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message=response, show_error='inline')
 
-    return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
+    return render_template('index.html', uuid_message=response, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
 @app.route('/retrive', methods=['GET'])
 def retrive_image():
-    search_uuid = request.values.get('search_uuid')
+    print(f'---------> Call retrive')
+    search_uuid = request.args.get('search_uuid')
 
     cached_data = read_cache(search_uuid)
 
     print(f'---------> Cached Data: {cached_data}')
 
-    if not cached_data:
-        return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
+    with app.app_context():
+        if not cached_data:
+            return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
 
-    if cached_data.startswith('ERROR'):
-       return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
+        if cached_data.startswith('ERROR'):
+        return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
 
-    return render_template('retrive.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
+        return render_template('retrive.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
 
 #@app.route('/upscale', methods=['POST'])
 #def return_upscaled_image():
