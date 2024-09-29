@@ -375,6 +375,7 @@ def delete_cache():
 @app.route('/')
 def root():
     retrived_uuid = request.values.get('uuid')
+    print(f'UUID: {retrived_uuid}')
     if retrived_uuid:
         cached_data = read_cache(retrived_uuid)
 
