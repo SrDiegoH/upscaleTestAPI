@@ -374,21 +374,6 @@ def delete_cache():
 
 @app.route('/')
 def root():
-    retrived_uuid = request.args.get('uuid')
-    print(f'---------> UUID: {retrived_uuid}')
-    if retrived_uuid:
-        cached_data = read_cache(retrived_uuid)
-
-        print(f'---------> Cached Data: {cached_data}')
-
-        if not cached_data:
-            return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
-
-        if cached_data.startswith('ERROR'):
-        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
-
-        return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
-
     return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='', show_error='none')
 
 @app.route('/', methods=['POST'])
