@@ -41,13 +41,12 @@ class BlurType:
     def _BILATERAL_FILTER(self, image, intensity):
         return cv2.bilateralFilter(image, intensity, 100, 100)
 
+
 def apply_blur(image, blur_type, intensity):
     return BlurType().blur(image, blur_type, intensity)
 
-
 def apply_denoise(image, intensity=0, template_window=7, search_window=21):
     return cv2.fastNlMeansDenoisingColored(image, None, intensity, intensity, template_window, search_window)
-
 
 class InterpolationType(Enum):
     NEAREST_NEIGHBOR = cv2.INTER_NEAREST
@@ -58,22 +57,6 @@ class InterpolationType(Enum):
     BILINEAR_EXACT = cv2.INTER_LINEAR_EXACT
     LANCZOS4 = cv2.INTER_LANCZOS4
     BITS2 = cv2.INTER_BITS2
-
-def apply_upscale(interpolation_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
-    image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
-
-    (image_height, image_width) = image.shape[:2]
-
-    new_width = int(image_width * scale_factor)
-    new_height = int(image_height * scale_factor)
-
-    new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
-
-    denoised_image = apply_denoise(new_image, denoise_intensity)
-
-    blurred_image = apply_blur(denoised_image, blur_type, blur_intensity)
-
-    return cv2.imencode('.png', blurred_image)[1]
 
 
 def delete_file(file_path):
@@ -265,6 +248,23 @@ class SuperResolutionType:
         return np.ascontiguousarray(new_image, dtype=np.uint8)
     '''
 
+
+def apply_upscale(interpolation_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
+    image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+
+    (image_height, image_width) = image.shape[:2]
+
+    new_width = int(image_width * scale_factor)
+    new_height = int(image_height * scale_factor)
+
+    new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
+
+    denoised_image = apply_denoise(new_image, denoise_intensity)
+
+    blurred_image = apply_blur(denoised_image, blur_type, blur_intensity)
+
+    return cv2.imencode('.png', blurred_image)[1]
+
 def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur_intensity, blur_type, scale_factor):
     rgb_image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
 
@@ -365,7 +365,7 @@ def read_cache(cache_uuid):
     return None
 
 def clear_cache(cache_uuid):
-    #print(f'Cleaning cache')
+    print(f'Cleaning cache')
     with open(CACHE_FILE, 'r') as cache_file:
         lines = cache_file.readlines()
 
@@ -373,15 +373,11 @@ def clear_cache(cache_uuid):
         for line in lines:
             if not line.startswith(cache_uuid):
                 cache_file.write(line)
-    #print(f'Cleaned')
+    print(f'Cleaned')
 
 def write_to_cache(cache_uuid, data):
     with open(CACHE_FILE, 'a') as cache_file:
         cache_file.write(f'{cache_uuid}#@#{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}#@#{data}\n')
-
-def delete_cache():
-    if os.path.exists(CACHE_FILE):
-        os.remove(CACHE_FILE)
 
 @app.route('/')
 def root():
@@ -410,7 +406,7 @@ def retrive_image():
             return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
 
         if cached_data.startswith('ERROR'):
-        return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
+            return render_template('retrive.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
 
         return render_template('retrive.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
 
