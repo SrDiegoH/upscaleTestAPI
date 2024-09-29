@@ -336,6 +336,7 @@ def upscale():
 
     return random_uuid, 201
 
+
 def read_cache(cache_uuid):
     if not os.path.exists(CACHE_FILE):
         return None
@@ -378,6 +379,7 @@ def clear_cache(cache_uuid):
 def write_to_cache(cache_uuid, data):
     with open(CACHE_FILE, 'a') as cache_file:
         cache_file.write(f'{cache_uuid}#@#{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}#@#{data}\n')
+
 
 @app.route('/')
 def root():
