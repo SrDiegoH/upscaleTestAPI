@@ -2,7 +2,9 @@ import base64
 from enum import Enum
 import logging
 import os
+import _thread
 from urllib.request import urlretrieve
+import uuid
 
 import cv2
 #from basicsr.archs.rrdbnet_arch import RRDBNet
@@ -14,6 +16,9 @@ import numpy as np
 app = Flask(__name__)
 
 logger = logging.getLogger()
+
+CACHE_FILE = '/tmp/cache.txt'
+CACHE_EXPIRY = timedelta(days=1)
 
 class BlurType:
     def blur(self, image, blut_type='SIMPLE_BLUR', intensity=0):
@@ -271,7 +276,7 @@ def apply_super_resolution(super_resolution_type, image, denoise_intensity, blur
     return blurred_image
 
 
-def upscale():
+def upscale(random_uuid):
     try:
         image = request.files.get('image')
 
@@ -311,29 +316,97 @@ def upscale():
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
 
-        return upscaled_image_base64, 200
+        write_to_cache(random_uuid, upscaled_image_base64)
+
+        return f'Salvo na cache com UUID: {random_uuid}', 200
     except Exception as error:
-        logger.exception("Exception Occured while code Execution: " + str(error))
+        error_message = str(error)
+
+        write_to_cache(random_uuid, f'ERROR: {error_message}')
+
+        logger.exception(f'Exception Occured while code Execution: {error_message}')
+
         return repr(error), 500
+
+def read_cache(cache_uuid):
+    if not os.path.exists(CACHE_FILE):
+        return None
+
+    control_clean_cache = False
+
+    #logger.info(f'Reading cache')
+    with open(CACHE_FILE, 'r') as cache_file:
+        for line in cache_file:
+            if not line.startswith(cache_uuid):
+                continue
+
+            _, cached_datetime, data = line.strip().split('#@#')
+
+            cached_date = datetime.strptime(cached_datetime, '%Y-%m-%d %H:%M:%S')
+
+            if datetime.now() - cached_date <= CACHE_EXPIRY:
+                #logger.info(f'Finished read')
+                return json.loads(data.replace("'", '"'))
+
+            control_clean_cache = True
+            break
+
+    if control_clean_cache:
+        clear_cache(cache_uuid)
+
+    return None
+
+def clear_cache(cache_uuid):
+    #logger.info(f'Cleaning cache')
+    with open(CACHE_FILE, 'r') as cache_file:
+        lines = cache_file.readlines()
+
+    with open(CACHE_FILE, 'w') as cache_file:
+        for line in lines:
+            if not line.startswith(cache_uuid):
+                cache_file.write(line)
+    #logger.info(f'Cleaned')
+
+def write_to_cache(cache_uuid, data):
+    with open(CACHE_FILE, 'a') as cache_file:
+        cache_file.write(f'{cache_uuid}#@#{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}#@#{data}\n')
+
+def delete_cache():
+    if os.path.exists(CACHE_FILE):
+        os.remove(CACHE_FILE)
 
 @app.route('/')
 def root():
-    return render_template('index.html', image='', show_image='none', error_message='', show_error='none')
+    return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='', show_error='none')
 
 @app.route('/', methods=['POST'])
-def show_upscaled_image():
-    response, code = upscale()
+def upscale_image():
+    random_uuid = str(uuid.uuid4())
 
-    if code == 200:
-        return render_template('index.html', image=response, show_image='inline', error_message='', show_error='none')
+    _thread.start_new_thread(upscale, (random_uuid))
 
-    return render_template('index.html', image='', show_image='none', error_message=response, show_error='inline')
+    return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
-@app.route('/upscale', methods=['POST'])
-def return_upscaled_image():
-    response, code = upscale()
+@app.route('/retrive', methods=['GET'])
+def retrive_image():
+    retrived_uuid = request.values.get('uuid')
 
-    return Response(f'<img src="data:image/png;base64,{response}">' if code == 200 else response, status=code)
+    cached_data = read_cache(retrived_uuid)
+
+    if not cached_data:
+        return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='Não encontrado, tente novamente', show_error='inline')        
+
+    if cached_data.startswith('ERROR'):
+       return render_template('index.html', uuid_message='', show_uuid='none', image='', show_image='none', error_message='cached_data', show_error='inline')
+
+    return render_template('index.html', uuid_message='', show_uuid='none', image=cached_data, show_image='inline', error_message='', show_error='none')
+
+
+#@app.route('/upscale', methods=['POST'])
+#def return_upscaled_image():
+#    response, code = upscale()
+#
+#    return Response(f'<img src="data:image/png;base64,{response}">' if code == 200 else response, status=code)
 
 if __name__ == '__main__':
     is_debug = os.getenv('IS_DEBUG', False)
