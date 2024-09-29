@@ -306,11 +306,12 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_in
 def upscale():
     image = request.files.get('image')
 
+    print(f'Image: {image}')
     if not image:
         return 'Imagem não enviada', 400
 
     image_bytes = np.fromfile(image, np.uint8)
-
+    print(f'Image byte: {image_bytes}')
     raw_scale_factor = request.values.get('scale_factor')
 
     if not raw_scale_factor:
