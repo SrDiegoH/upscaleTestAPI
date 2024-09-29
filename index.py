@@ -384,7 +384,7 @@ def root():
 def upscale_image():
     random_uuid = str(uuid.uuid4())
 
-    _thread.start_new_thread(upscale, (random_uuid))
+    _thread.start_new_thread(upscale, (random_uuid,))
 
     return render_template('index.html', uuid_message=random_uuid, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
