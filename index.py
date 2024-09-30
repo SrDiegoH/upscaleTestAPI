@@ -342,7 +342,7 @@ def upscale():
     #"""
     print(f'Continuing main process')
 
-    return random_uuid, 400
+    return random_uuid, 201
 
 
 def read_cache(cache_uuid):
