@@ -251,11 +251,9 @@ class SuperResolutionType:
 
 def apply_upscale(interpolation_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
     print(f'----> Start apply_upscale')
-    #image_bytes = np.array(image_buffer).reshape((225, 225))
-    #image_bytes = np.fromfile(image, np.uint8) #fromfile - fromstring
-    #image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+    image_bytes = np.fromstring(image_buffer, np.uint8) # fromfile - fromstring
+    image = cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED) # imread - imdecode
 
-    image = cv2.imread(image_buffer, cv2.IMREAD_UNCHANGED)
     print(f'----> Decoded image: {image}')
 
     (image_height, image_width) = image.shape[:2]
@@ -277,7 +275,7 @@ def apply_upscale(interpolation_type, image_buffer, denoise_intensity, blur_inte
     return cv2.imencode('.png', blurred_image)[1]
 
 def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
-    image_bytes = np.fromfile(image_buffer, np.uint8) #fromfile - fromstring
+    image_bytes = np.fromstring(image_buffer, np.uint8) #fromfile - fromstring
 
     rgb_image = cv2.cvtColor(image_bytes, cv2.COLOR_RGBA2RGB)
 
@@ -309,7 +307,8 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_i
         write_to_cache(random_uuid, f'ERROR: {str(error)}')
 
 def upscale():
-    image_buffer = request.files.get('image').read() #request.files['image'].read()
+    #image_buffer = request.files.get('image').read()
+    image_buffer = request.files['image'].read()
 
     print(f'Image: {image_buffer}')
     if not image_buffer:
