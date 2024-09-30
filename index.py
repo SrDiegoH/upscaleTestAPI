@@ -287,11 +287,9 @@ def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensit
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        print(f'----> Upscale type: {upscale_type} - {dir(InterpolationType)} - {upscale_type in dir(InterpolationType)}')
+        print(f'----> Upscale type: {upscale_type}, Is in interpolation type list? {upscale_type in dir(InterpolationType)}')
         if upscale_type in dir(InterpolationType):
-            print(f'----> Upscaling...')
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
-            print(f'----> Upscaled')
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
             upscaled_image = apply_super_resolution(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
         else:
@@ -309,8 +307,8 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_i
 def upscale():
     #image_buffer = request.files.get('image').read()
     image_buffer = request.files['image'].read()
-
     print(f'Image: {image_buffer}')
+
     if not image_buffer:
         return 'Imagem não enviada', 400
 
@@ -338,20 +336,19 @@ def upscale():
     random_uuid = str(uuid.uuid4())
 
     #_thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
-    #process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    #"""
+    process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    """
     threading.Thread(
         target=process_and_save_on_cache,
         args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor),
     ).start()
-    #"""
+    """
 
     return random_uuid, 201
 
 
 def read_cache(cache_uuid):
-    print(f'----> Reading cache')
-    print(f'----> Does file exists? {os.path.exists(CACHE_FILE)}')
+    print(f'----> Reading cache by {search_uuid}. Does file exists? {os.path.exists(CACHE_FILE)}')
 
     if not os.path.exists(CACHE_FILE):
         return None
@@ -384,7 +381,6 @@ def read_cache(cache_uuid):
     return None
 
 def clear_cache(cache_uuid):
-    print(f'-----> Cleaning cache')
     with open(CACHE_FILE, 'r') as cache_file:
         lines = cache_file.readlines()
 
@@ -392,10 +388,8 @@ def clear_cache(cache_uuid):
         for line in lines:
             if not line.startswith(cache_uuid):
                 cache_file.write(line)
-    print(f'-----> Cleaned')
 
 def write_to_cache(cache_uuid, data):
-    print(f'---> Cleaning cache')
     with open(CACHE_FILE, 'a') as cache_file:
         cache_file.write(f'{cache_uuid}#@#{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}#@#{data}\n')
 
@@ -415,11 +409,7 @@ def upscale_image():
 
 @app.route('/retrive', methods=['GET'])
 def retrive_image():
-    print(f'---> Call retrive')
-
     search_uuid = request.args.get('search_uuid')
-
-    print(f'---> Search Uuid: {search_uuid}')
 
     cached_data = read_cache(search_uuid)
 
