@@ -250,24 +250,26 @@ class SuperResolutionType:
 
 
 def apply_upscale(interpolation_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
-    print(f'Start apply_upscale: {image_buffer}')
+    print(f'Start apply_upscale. Is Image buffer null? {image_buffer is not None}')
     image_bytes = np.fromstring(image_buffer, np.uint8)
     print(f'numpy from string: {image_bytes}')
     image = cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
     print(f'cv2 image decode: {image}')
 
     (image_height, image_width) = image.shape[:2]
+    print(f'Old shape: {(image_height, image_width)}')
 
-    print(f'shape')
     new_width = int(image_width * scale_factor)
     new_height = int(image_height * scale_factor)
+    print(f'New shape: {(new_width, new_height)}')
 
-    print(f'new shape')
     new_image = cv2.resize(image, (new_width, new_height), interpolation=InterpolationType[interpolation_type].value)
+    print(f'Image resized')
 
-    print(f'image resized')
     denoised_image = apply_denoise(new_image, denoise_intensity)
+    print(f'Image denoised')
     blurred_image = apply_blur(denoised_image, blur_type, blur_intensity)
+    print(f'Image blurred')
 
     return cv2.imencode('.png', blurred_image)[1]
 
@@ -284,23 +286,23 @@ def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensit
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        print(f'Start process_and_save_on_cache')
+        print(f'Start process_and_save_on_cache: {upscale_type}')
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
             upscaled_image = apply_super_resolution(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
         else:
             raise Exception('Tipo de aumento não conhecido')
+        print(f'Upscaled image: {upscaled_image}')
 
-        print(f'upscaled')
         upscaled_image_bytes = np.array(upscaled_image).tobytes()
         upscaled_image_base64 = base64.b64encode(upscaled_image_bytes).decode("utf-8")
+        print(f'Encoded image: {upscaled_image_base64}')
 
-        print(f'encoded')
         write_to_cache(random_uuid, upscaled_image_base64)
     except Exception as error:
         write_to_cache(random_uuid, f'ERROR: {str(error)}')
-    print(f'cached')
+    print(f'Finished process_and_save_on_cache')
 
 def upscale():
     image_buffer = request.files['image'].read()
@@ -339,7 +341,7 @@ def upscale():
     ).start()
     """
 
-    return random_uuid, 201
+    return random_uuid, 400
 
 
 def read_cache(cache_uuid):
