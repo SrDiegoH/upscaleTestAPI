@@ -286,7 +286,7 @@ def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensit
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        print(f'Start process_and_save_on_cache: {upscale_type}')
+        print(f'Start process_and_save_on_cache in new process. Upscale type: {upscale_type}')
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
@@ -333,15 +333,16 @@ def upscale():
 
     random_uuid = str(uuid.uuid4())
 
-    process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    """
+    #process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    #"""
     multiprocessing.Process(
         target=process_and_save_on_cache,
         args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
     ).start()
-    """
+    #"""
+    print(f'Continuing main process')
 
-    return random_uuid, 400
+    return random_uuid, 201
 
 
 def read_cache(cache_uuid):
