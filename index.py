@@ -290,6 +290,7 @@ def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_i
     while True:
         count += 1
         print(f'Separated process loop n# {count}')
+        time.sleep(0.001)
     try:
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
