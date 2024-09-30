@@ -251,11 +251,11 @@ class SuperResolutionType:
 
 def apply_upscale(interpolation_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
     print(f'----> Start apply_upscale')
-    image_bytes = np.array(image_buffer).reshape((225, 225))
+    #image_bytes = np.array(image_buffer).reshape((225, 225))
     #image_bytes = np.fromfile(image, np.uint8) #fromfile - fromstring
-    image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+    #image = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
-    #image = cv2.imread(image_buffer, cv2.IMREAD_UNCHANGED)
+    image = cv2.imread(image_buffer, cv2.IMREAD_UNCHANGED)
     print(f'----> Decoded image: {image}')
 
     (image_height, image_width) = image.shape[:2]
