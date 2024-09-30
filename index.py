@@ -396,6 +396,7 @@ def upscale_image():
     if status == 400:
         return render_template('index.html', uuid_message='', show_uuid='none', error_message=response, show_error='inline')
 
+    print(f'Finishing main process')
     return render_template('index.html', uuid_message=response, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
 @app.route('/retrive', methods=['GET'])
