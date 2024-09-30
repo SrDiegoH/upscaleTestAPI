@@ -323,12 +323,11 @@ def upscale():
 
     #process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
     #"""
-    with app.app_context():
-        threading.Thread(
-            target=process_and_save_on_cache,
-            args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor),
-            daemon=True
-        ).start()
+    threading.Thread(
+        target=process_and_save_on_cache,
+        args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor),
+        daemon=False
+    ).start()
     #"""
 
     return random_uuid, 201
