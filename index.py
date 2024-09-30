@@ -285,6 +285,12 @@ def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensit
     return blurred_image
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
+    import time
+    count = 0
+    while True:
+        count += 1
+        print(f'Separated process loop n# {count}')
+        time.sleep(1)
     try:
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
