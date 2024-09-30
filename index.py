@@ -321,29 +321,25 @@ def upscale():
 
     random_uuid = str(uuid.uuid4())
 
-    process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    """
+    #process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    #"""
     threading.Thread(
         target=process_and_save_on_cache,
         args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor),
     ).start()
-    """
+    #"""
 
     return random_uuid, 201
 
 
 def read_cache(cache_uuid):
-    print(f'----> Reading cache by {cache_uuid}. Does file exists? {os.path.exists(CACHE_FILE)}')
-
     if not os.path.exists(CACHE_FILE):
         return None
 
     control_clean_cache = False
 
-    print(f'----> Opening cache file')
     with open(CACHE_FILE, 'r') as cache_file:
         for line in cache_file:
-            print(f'-----> Line: {line}')
             if not line.startswith(cache_uuid):
                 continue
 
@@ -351,15 +347,12 @@ def read_cache(cache_uuid):
 
             cached_date = datetime.strptime(cached_datetime, '%Y-%m-%d %H:%M:%S')
 
-            print(f'-----> Cache date: {cached_date}, is expired? {datetime.now() - cached_date <= CACHE_EXPIRY}')
             if datetime.now() - cached_date <= CACHE_EXPIRY:
-                print(f'------> Finished read, cache found: {data}')
                 return data
 
             control_clean_cache = True
             break
 
-    print(f'----> Cleaning cache? {control_clean_cache}')
     if control_clean_cache:
         clear_cache(cache_uuid)
 
@@ -397,8 +390,6 @@ def retrive_image():
     search_uuid = request.args.get('search_uuid')
 
     cached_data = read_cache(search_uuid)
-
-    print(f'---> Cached Data: {cached_data}')
 
     with app.app_context():
         if not cached_data:
