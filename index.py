@@ -342,7 +342,7 @@ def upscale():
     #"""
     print(f'Continuing main process')
 
-    return random_uuid, 201
+    return random_uuid, 400
 
 
 def read_cache(cache_uuid):
@@ -394,8 +394,7 @@ def upscale_image():
     response, status = upscale()
 
     if status == 400:
-        with app.app_context():
-            return render_template('retrive.html', image='', show_image='none', error_message=response, show_error='inline')
+        return render_template('index.html', uuid_message='', show_uuid='none', error_message=response, show_error='inline')
 
     return render_template('index.html', uuid_message=response, show_uuid='inline', image='', show_image='none', error_message='', show_error='none')
 
