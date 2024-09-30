@@ -335,8 +335,7 @@ def upscale():
 
     random_uuid = str(uuid.uuid4())
 
-    #_thread.start_new_thread(process_and_save_on_cache, (random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor))
-    process_and_save_on_cache(random_uuid, upscale_type, image_bytes, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
     """
     threading.Thread(
         target=process_and_save_on_cache,
