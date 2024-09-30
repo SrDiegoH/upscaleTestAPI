@@ -354,7 +354,7 @@ def read_cache(cache_uuid):
             print(f'-----> Cache date: {cached_date}, is expired? {datetime.now() - cached_date <= CACHE_EXPIRY}')
             if datetime.now() - cached_date <= CACHE_EXPIRY:
                 print(f'------> Finished read, cache found: {data}')
-                return json.loads(data.replace("'", '"'))
+                return data
 
             control_clean_cache = True
             break
