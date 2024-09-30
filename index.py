@@ -2,7 +2,7 @@ import base64
 import json
 import os
 import uuid
-import threading
+import multiprocessing
 from datetime import datetime, timedelta
 from enum import Enum
 from urllib.request import urlretrieve
@@ -322,13 +322,16 @@ def upscale():
     random_uuid = str(uuid.uuid4())
 
     #process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
-    #"""
+    """
     threading.Thread(
         target=process_and_save_on_cache,
-        args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor),
-        daemon=False
+        args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
     ).start()
-    #"""
+    """
+    multiprocessing.Process(
+        target=process_and_save_on_cache,
+        args=(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
+    ).start()
 
     return random_uuid, 201
 
