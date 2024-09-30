@@ -250,11 +250,11 @@ class SuperResolutionType:
 
 
 def apply_upscale(interpolation_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor=4):
-    print(f'Start apply_upscale. Is Image buffer null? {image_buffer is not None}')
+    print(f'Start apply_upscale. Is Image buffer not null? {image_buffer is not None}')
     image_bytes = np.fromstring(image_buffer, np.uint8)
-    print(f'numpy from string: {image_bytes}')
+    print(f'Numpy from string: {image_bytes}')
     image = cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
-    print(f'cv2 image decode: {image}')
+    print(f'Cv2 image decode: {image}')
 
     (image_height, image_width) = image.shape[:2]
     print(f'Old shape: {(image_height, image_width)}')
@@ -286,7 +286,6 @@ def apply_super_resolution(super_resolution_type, image_buffer, denoise_intensit
 
 def process_and_save_on_cache(random_uuid, upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor):
     try:
-        print(f'Start process_and_save_on_cache in new process. Upscale type: {upscale_type}')
         if upscale_type in dir(InterpolationType):
             upscaled_image = apply_upscale(upscale_type, image_buffer, denoise_intensity, blur_intensity, blur_type, scale_factor)
         elif upscale_type and f'_{upscale_type.strip()}' in dir(SuperResolutionType):
